@@ -89,16 +89,4 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
         super.successfulAuthentication(request, response, chain, authentication);
     }
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        // Creating a body to send back in the request
-        Map<String, Object> tokens = new HashMap<>();
-        tokens.put("Error", "Incorrect details");
-
-        response.setContentType(APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-
-        super.unsuccessfulAuthentication(request, response, failed);
-    }
 }
