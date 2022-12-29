@@ -30,23 +30,21 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RestController
 @RequestMapping( "/api")
 @RequiredArgsConstructor
+@CrossOrigin
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/getAllUsers")
-    @CrossOrigin
     public ResponseEntity<List<User>>getAllUsers(){
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
     @PostMapping("/users/addRoleToUser")
-    @CrossOrigin("http://localhost:3000")
     public ResponseEntity<User>addRoleToUser(@RequestBody RoleToUserForm form){
         return ResponseEntity.ok().body(userService.addRoleToUser(form.getUsername(), form.getRoleName()));
     }
 
     @PostMapping("/user/register")
-    @CrossOrigin("http://localhost:3000")
     public ResponseEntity<HashMap<String, Object>> registerUser(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
         userService.saveUser(user);
 

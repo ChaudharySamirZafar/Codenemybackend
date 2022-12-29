@@ -4,7 +4,6 @@ import codenemy.api.Auth.model.User;
 import codenemy.api.Auth.model.Role;
 import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
-import codenemy.api.Auth.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,8 +31,6 @@ class UserServiceTest {
     private UserRepo mockUserRepo;
     @Mock
     private RoleRepo mockRoleRepo;
-    @Mock
-    private HttpServletRequest request;
     @Mock
     private BCryptPasswordEncoder mockBCryptPasswordEncoder;
 

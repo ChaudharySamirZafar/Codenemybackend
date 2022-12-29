@@ -17,6 +17,11 @@ import java.util.Map;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 28/12/2022
+ */
 @Slf4j
 public class Utility {
 
