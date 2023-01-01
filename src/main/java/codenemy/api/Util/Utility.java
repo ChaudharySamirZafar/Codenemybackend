@@ -1,5 +1,8 @@
 package codenemy.api.Util;
 
+import codenemy.api.Compiler.Model.SingleTestCaseResult;
+import codenemy.api.Compiler.Model.TestCaseResult;
+import codenemy.api.Problem.model.TestCase;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
