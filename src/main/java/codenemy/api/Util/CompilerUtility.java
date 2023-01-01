@@ -122,6 +122,8 @@ public class CompilerUtility {
             testCaseResult = new TestCaseResult(1, listOfOutput);
         }
 
+        scanner.close();
+
         return testCaseResult;
     }
 
@@ -189,5 +191,15 @@ public class CompilerUtility {
             case "Hard", "hard" -> HARD_POINT_MULTIPLIER;
             default -> EASY_POINT_MULTIPLIER;
         };
+    }
+
+    public void deleteFile(String name){
+        File file = new File(name);
+
+        if (file.delete()){
+            log.info("File {} deleted", name);
+        } else {
+            log.info("File {} not deleted", name);
+        }
     }
 }

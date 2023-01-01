@@ -6,6 +6,7 @@ import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
 
+import java.io.File;
 import java.util.Comparator;
 
 public class JavaCompilerService implements LanguageCompilerServiceIF {
@@ -20,7 +21,15 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
-        return compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+        SingleTestCaseResult singleTestCaseResult =
+                compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+
+        compilerUtil.deleteFile("TestRun.class");
+        compilerUtil.deleteFile("TestRun.java");
+        compilerUtil.deleteFile("Solution.class");
+        compilerUtil.deleteFile("results_"+request.username()+".txt");
+
+        return singleTestCaseResult;
     }
 
     @Override
@@ -34,6 +43,14 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
-        return compilerUtil.calculateAllTestResultsWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+        MultipleTestCaseResults multipleTestCaseResults =
+                compilerUtil.calculateAllTestResultsWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+
+        compilerUtil.deleteFile("TestRun.class");
+        compilerUtil.deleteFile("TestRun.java");
+        compilerUtil.deleteFile("Solution.class");
+        compilerUtil.deleteFile("results_"+request.username()+".txt");
+
+        return multipleTestCaseResults;
     }
 }
