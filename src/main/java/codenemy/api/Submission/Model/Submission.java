@@ -13,6 +13,11 @@ import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 01/01/2023
+ */
 @Entity
 @Getter
 @Setter

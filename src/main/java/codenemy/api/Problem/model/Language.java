@@ -10,6 +10,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 30/12/2022
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

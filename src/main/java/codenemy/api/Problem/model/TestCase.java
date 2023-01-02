@@ -1,6 +1,5 @@
 package codenemy.api.Problem.model;
 
-import codenemy.api.Problem.model.Problem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +8,11 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 30/12/2022
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

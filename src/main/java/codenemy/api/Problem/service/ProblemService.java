@@ -1,7 +1,7 @@
 package codenemy.api.Problem.service;
 
-import codenemy.api.Problem.repository.ProblemRepository;
 import codenemy.api.Problem.model.Problem;
+import codenemy.api.Problem.repository.ProblemRepository;
 import codenemy.api.Submission.Repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 30/12/2022
+ */
 @Service
 public class ProblemService {
     private final ProblemRepository problemRepository;

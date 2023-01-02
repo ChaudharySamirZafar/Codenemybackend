@@ -1,9 +1,9 @@
 package codenemy.api.Compiler.Model;
 
 /**
- * @author samir.zafar
+ * @author chaudhary samir zafar
  * @version 1.0
- * @since 12/09/22
+ * @since 01/01/2023
  */
 public record Request(String language, String script, int problemId, String username, int userId) {
 }

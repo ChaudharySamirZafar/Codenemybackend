@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 30/12/2022
+ */
 @Entity
 @Data
 @AllArgsConstructor

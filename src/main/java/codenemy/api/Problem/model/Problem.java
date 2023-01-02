@@ -1,11 +1,18 @@
 package codenemy.api.Problem.model;
 
-import lombok.*;
-import org.hibernate.annotations.Formula;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 30/12/2022
+ */
 @Entity
 @Getter
 @Setter

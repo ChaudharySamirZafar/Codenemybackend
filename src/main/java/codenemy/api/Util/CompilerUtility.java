@@ -1,9 +1,9 @@
 package codenemy.api.Util;
 
+import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.TestCaseResult;
-import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 01/01/2023
+ */
 @Slf4j
 public class CompilerUtility {
     static int EASY_POINT_MULTIPLIER = 10;
@@ -77,21 +82,21 @@ public class CompilerUtility {
 
         try {
             while ((output = stdInput.readLine()) != null) {
-                System.out.println(output);
+                log.info("Output from user {} : {}", request.username(), output);
                 // Add output here.
                 assert testCaseResult != null;
                 testCaseResult.getOutput().add(output);
             }
 
             while ((output = stdError.readLine()) != null) {
-                System.out.println(output);
+
             }
 
             stdInput.close();
             stdError.close();
         }
         catch (IOException exception) {
-            System.out.println("Error with printing the data");
+            log.info("Error reading the data");
         }
 
         return testCaseResult;

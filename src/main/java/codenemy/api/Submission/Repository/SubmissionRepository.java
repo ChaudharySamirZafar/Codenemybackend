@@ -9,6 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 01/01/2023
+ */
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Integer> {
     @Query("select s.problem.id from Submission s where s.user.id = :userId")

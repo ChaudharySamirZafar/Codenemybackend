@@ -6,6 +6,11 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 01/01/2023
+ */
 @Getter
 @Setter
 public class TestCaseResult {
