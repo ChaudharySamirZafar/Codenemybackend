@@ -4,8 +4,14 @@ import codenemy.api.Compiler.Model.*;
 import codenemy.api.Compiler.Service.LanguageCompilerService.LanguageCompilerServiceIF;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.ProblemLanguage;
+import codenemy.api.Submission.Model.Submission;
+import codenemy.api.Submission.Service.SubmissionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * @author samir.zafar
@@ -16,6 +22,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CompilerService {
     private DelegationService delegationService;
+    private SubmissionService submissionService;
 
     public SingleTestCaseResult runScriptForOneTestCase(Request request, Problem problem) {
 
@@ -37,7 +44,25 @@ public class CompilerService {
         // First find the problem Lang
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
 
-        return languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
+        MultipleTestCaseResults multipleTestCaseResults =
+                languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String json;
+        try {
+            json = mapper.writeValueAsString(multipleTestCaseResults);
+        }
+        catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        submissionService.addSubmission(
+                new Submission(0, null, problem, LocalDateTime.now(), json, multipleTestCaseResults.getPercentage(), multipleTestCaseResults.getPoints()),
+                request.userId(),
+                multipleTestCaseResults);
+
+        return multipleTestCaseResults;
     }
 
     private ProblemLanguage findProblemLanguageSelected(Problem problem, String selectedLang){

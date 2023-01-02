@@ -20,11 +20,32 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
-        return compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+
+        SingleTestCaseResult singleTestCaseResult =
+                compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+
+        compilerUtil.deleteFile("test.py");
+        compilerUtil.deleteFile("results_"+request.username()+".txt");
+
+        return singleTestCaseResult;
     }
 
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, String script, Problem problem) {
-        return null;
+
+        compilerUtil.createNewFile("test.py");
+        compilerUtil.writeScriptToFile(script);
+
+        Process process = compilerUtil.startProcess("python test.py");
+
+        problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
+
+        MultipleTestCaseResults multipleTestCaseResults =
+                compilerUtil.calculateAllTestResultsWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+
+        compilerUtil.deleteFile("test.py");
+        compilerUtil.deleteFile("results_"+request.username()+".txt");
+
+        return multipleTestCaseResults;
     }
 }

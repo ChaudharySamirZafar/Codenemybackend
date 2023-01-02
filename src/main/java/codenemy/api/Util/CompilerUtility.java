@@ -146,7 +146,7 @@ public class CompilerUtility {
         // Output and testCaseList should be of same size.
         List<TestCase> testCaseList = problem.getTestCases();
 
-        boolean sameSize = testCaseList.size() == result.getOutput().size();
+        boolean sameSize = testCaseList.size() == result.getResult().size();
 
         int timesToLoop = testCaseList.size();
         if (!sameSize) {

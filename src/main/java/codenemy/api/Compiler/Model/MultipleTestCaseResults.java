@@ -13,4 +13,5 @@ public class MultipleTestCaseResults {
     private List<SingleTestCaseResult> testCaseResultList;
     private int percentage;
     private int points;
+    private int newProblemPoints;
 }
