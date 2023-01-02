@@ -21,13 +21,13 @@ import java.time.LocalDateTime;
 @Service
 @AllArgsConstructor
 public class CompilerService {
-    private DelegationService delegationService;
+    private CompilerServiceFactory compilerServiceFactory;
     private SubmissionService submissionService;
 
     public SingleTestCaseResult runScriptForOneTestCase(Request request, Problem problem) {
 
         // Retrieve the correct and appropriate compiler service
-        LanguageCompilerServiceIF languageCompilerServiceIF = delegationService.getSpecificLanguageCompilerService(request.language());
+        LanguageCompilerServiceIF languageCompilerServiceIF = compilerServiceFactory.getSpecificLanguageCompilerService(request.language());
 
         // First find the problem Lang
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
@@ -39,7 +39,7 @@ public class CompilerService {
 
     public MultipleTestCaseResults runScriptForAllTestCases(Request request, Problem problem) {
         // Retrieve the correct and appropriate compiler service
-        LanguageCompilerServiceIF languageCompilerServiceIF = delegationService.getSpecificLanguageCompilerService(request.language());
+        LanguageCompilerServiceIF languageCompilerServiceIF = compilerServiceFactory.getSpecificLanguageCompilerService(request.language());
 
         // First find the problem Lang
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());

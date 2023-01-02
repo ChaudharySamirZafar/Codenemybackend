@@ -5,8 +5,7 @@ import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
-
-import java.io.File;
+;
 import java.util.Comparator;
 
 public class JavaCompilerService implements LanguageCompilerServiceIF {
