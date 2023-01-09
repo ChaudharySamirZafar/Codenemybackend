@@ -44,6 +44,34 @@ public class UserController {
         return ResponseEntity.ok().body(userService.addRoleToUser(form.getUsername(), form.getRoleName()));
     }
 
+    @PostMapping("/user/changeDetails")
+    public ResponseEntity<HashMap<String, Object>>ChangeUserDetails(
+            @RequestParam int userId, @RequestParam String newUserName, @RequestParam String newPassword, HttpServletRequest request, HttpServletResponse response){
+        User user = userService.updateUser(userId, newUserName, newPassword);
+
+        String access_token = JWT.create()
+                .withSubject(user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withIssuer(request.getRequestURL().toString())
+                .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .sign(Utility.algorithm);
+
+        String refresh_token = JWT.create()
+                .withSubject(user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withIssuer(request.getRequestURL().toString())
+                .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .sign(Utility.algorithm);
+
+        HashMap<String, Object> tokens = new HashMap<>();
+        tokens.put("access_token", access_token);
+        tokens.put("refresh_token", refresh_token);
+
+        tokens.put("userModel", user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(tokens);
+    }
+
     @PostMapping("/user/register")
     public ResponseEntity<HashMap<String, Object>> registerUser(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
         userService.saveUser(user);

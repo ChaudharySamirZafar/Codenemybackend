@@ -12,12 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * @author chaudhary samir zafar
@@ -51,6 +49,22 @@ public class UserService implements IUserService, UserDetailsService {
         userRepo.save(user);
         addRoleToUser(user.getUsername(), "ROLE_USER");
         return user;
+    }
+
+    public User updateUser(int userId, String newUserName, String newPassword) {
+        // First find the user.
+        Optional<User> user = userRepo.findById(userId);
+
+        if (user.isEmpty()) return null;
+
+        if (!newPassword.isEmpty()) {
+            user.get().setPassword(bCryptPasswordEncoder.encode(newPassword));
+        }
+        if (!newUserName.isEmpty()) {
+            user.get().setUsername(newUserName);
+        }
+
+        return user.get();
     }
 
     @Override
