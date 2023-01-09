@@ -67,6 +67,16 @@ public class CompilerService {
         return multipleTestCaseResults;
     }
 
+    public MultipleTestCaseResults runScriptForAllTestCasesWithChallenge(Request request, Problem problem) {
+        // Retrieve the correct and appropriate compiler service
+        LanguageCompilerServiceIF languageCompilerServiceIF = compilerServiceFactory.getSpecificLanguageCompilerService(request.language());
+
+        // First find the problem Lang
+        ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
+
+        return languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
+    }
+
     private ProblemLanguage findProblemLanguageSelected(Problem problem, String selectedLang){
         return problem.getProblemLanguages()
                         .stream()
