@@ -71,6 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Requests only people that have logged in should have
         http.authorizeRequests().antMatchers("/api/compiler/runSingleTestCase").permitAll();
         http.authorizeRequests().antMatchers("/api/compiler/runAllTestCases").permitAll();
+        http.authorizeRequests().antMatchers("/api/compiler/runAllTestCasesChallenge").permitAll();
 
         // Requests that only admins should be able to make.
         http.authorizeRequests().antMatchers(GET,"/api/getAllUsers").hasAnyAuthority("ROLE_ADMIN");

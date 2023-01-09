@@ -42,4 +42,10 @@ public class CompilerController {
 
         return ResponseEntity.ok().body(compilerService.runScriptForAllTestCases(request, problemService.getProblem(request.problemId())));
     }
+
+    @PostMapping(path = "/runAllTestCasesChallenge")
+    public ResponseEntity<MultipleTestCaseResults> runScriptForAllTestCasesWithChallenge(@RequestBody Request request) {
+
+        return ResponseEntity.ok().body(compilerService.runScriptForAllTestCasesWithChallenge(request, problemService.getProblem(request.problemId())));
+    }
 }
