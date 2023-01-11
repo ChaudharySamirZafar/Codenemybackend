@@ -15,12 +15,6 @@ build:
     - mvn $MAVEN_CLI_OPTS clean compile
 
 test:
-  before_script:
-    - python -V
-    - pip install virtualenv
-    - virtualenv venv
-    - .\venv\Scripts\activate.ps1
-    - refreshenv
   stage: test
   image: maven:latest
   script:
