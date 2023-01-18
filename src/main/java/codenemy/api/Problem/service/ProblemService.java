@@ -31,7 +31,7 @@ public class ProblemService {
     }
 
     public List<Problem> getAllProblemsLoggedIn(int userId){
-        Set<Integer> integerSet = submissionRepository.findSubmissionByUserAndProblem(userId);
+        Set<Integer> integerSet = submissionRepository.findSubmissionByUser(userId);
 
         List<Problem> problemList = problemRepository.findAll();
 

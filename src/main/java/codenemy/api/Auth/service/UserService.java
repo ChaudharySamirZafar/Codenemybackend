@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -63,6 +62,8 @@ public class UserService implements IUserService, UserDetailsService {
         if (!newUserName.isEmpty()) {
             user.get().setUsername(newUserName);
         }
+
+        userRepo.save(user.get());
 
         return user.get();
     }

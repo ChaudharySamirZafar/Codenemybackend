@@ -5,6 +5,8 @@ import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import codenemy.api.Util.CompilerUtility;
+import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
 
@@ -13,8 +15,9 @@ import java.util.Comparator;
  * @version 1.0
  * @since 01/01/2023
  */
+@AllArgsConstructor
 public class PythonCompilerService implements LanguageCompilerServiceIF {
-
+    CompilerUtility compilerUtil;
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, String script, Problem problem) {
 

@@ -59,7 +59,7 @@ public class Utility {
         try {
             new ObjectMapper().writeValue(response.getOutputStream(), tokens);
         }
-        catch (IOException exception) {
+        catch (Exception exception) {
             log.error("Error logging in {}", exception.getMessage());
         }
     }
