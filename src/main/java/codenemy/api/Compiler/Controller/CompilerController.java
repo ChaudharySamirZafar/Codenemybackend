@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/compiler")
 @CrossOrigin
 public class CompilerController {
-
     private final ProblemService problemService;
     private final CompilerService compilerService;
 

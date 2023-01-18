@@ -8,6 +8,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 18/01/2023
+ */
 @DataJpaTest
 class RoleRepositoryTest {
 

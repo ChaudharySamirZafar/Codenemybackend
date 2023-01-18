@@ -57,11 +57,8 @@ public class CompilerUtility {
             process = Runtime.getRuntime().exec(command);
             process.waitFor();
         }
-        catch (IOException exception) {
-            log.info("IOException in process");
-            log.info("Command {} ", command);
-        } catch (InterruptedException e) {
-            log.info("InterruptedException in process");
+        catch (Exception exception) {
+            log.info("Exception in process");
             log.info("Command {} ", command);
         }
 
@@ -88,10 +85,6 @@ public class CompilerUtility {
                 testCaseResult.getOutput().add(output);
             }
 
-            while ((output = stdError.readLine()) != null) {
-
-            }
-
             stdInput.close();
             stdError.close();
         }
@@ -102,7 +95,7 @@ public class CompilerUtility {
         return testCaseResult;
     }
 
-    public TestCaseResult retrieveScriptReturnValues(Request request) {
+    private TestCaseResult retrieveScriptReturnValues(Request request) {
         Scanner scanner;
 
         try {
@@ -111,11 +104,8 @@ public class CompilerUtility {
                 file.createNewFile();
             }
             scanner = new Scanner(file);
-        }
-        catch (FileNotFoundException ignored) {
-            return null;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
         }
 
         ArrayList<String> listOfOutput = new ArrayList<>();
@@ -151,17 +141,10 @@ public class CompilerUtility {
         // Output and testCaseList should be of same size.
         List<TestCase> testCaseList = problem.getTestCases();
 
-        boolean sameSize = testCaseList.size() == result.getResult().size();
-
-        int timesToLoop = testCaseList.size();
-        if (!sameSize) {
-           timesToLoop = Math.min(testCaseList.size(), result.getOutput().size());
-        }
-
         List<SingleTestCaseResult> listOfResults = new ArrayList<>();
         int passCount = 0;
 
-        for(int i = 0; i < timesToLoop; i++) {
+        for(int i = 0; i < problem.getTestCases().size(); i++) {
            String output = result.getResult().get(i);
            TestCase testCase = testCaseList.get(i);
 
@@ -203,7 +186,8 @@ public class CompilerUtility {
 
         if (file.delete()){
             log.info("File {} deleted", name);
-        } else {
+        }
+        else {
             log.info("File {} not deleted", name);
         }
     }

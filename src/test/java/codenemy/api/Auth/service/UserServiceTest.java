@@ -1,7 +1,7 @@
 package codenemy.api.Auth.service;
 
-import codenemy.api.Auth.model.User;
 import codenemy.api.Auth.model.Role;
+import codenemy.api.Auth.model.User;
 import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +17,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author chaudhary samir zafar
+ * @version 1.0
+ * @since 18/01/2023
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -236,6 +243,41 @@ class UserServiceTest {
         sut.getUsers();
         // then
         verify(mockUserRepo).findAll();
+    }
+
+    @Test
+    void updateUser() {
+        // Given
+        int userId = 5;
+        String newUserName = "updatedUserName";
+        String newPassword = "newPassword";
+        User user = new User(5, "", "", 0, 0, null, null);
+        when(mockUserRepo.findById(userId)).thenReturn(Optional.of(user));
+        when(mockBCryptPasswordEncoder.encode(newPassword)).thenReturn(newPassword);
+
+        // When
+        User result = sut.updateUser(userId, newUserName, newPassword);
+
+        // Then
+        assertEquals(newUserName, result.getUsername());
+        assertEquals(newPassword, result.getPassword());
+
+        verify(mockUserRepo).findById(userId);
+        verify(mockUserRepo).save(user);
+    }
+
+    @Test
+    void updateUserThatDoesNotExist() {
+        // Given
+        int userId = 5;
+        String newUserName = "updatedUserName";
+        String newPassword = "newPassword";
+
+        // When
+        sut.updateUser(userId, newUserName, newPassword);
+
+        // Then
+        verify(mockUserRepo).findById(userId);
     }
 }
 
