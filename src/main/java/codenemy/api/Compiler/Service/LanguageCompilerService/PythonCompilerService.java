@@ -52,7 +52,7 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
         compilerUtil.createNewFile("test.py");
         compilerUtil.writeScriptToFile(script);
 
-        Process process = compilerUtil.startProcess("python test.py");
+        Process process = compilerUtil.startProcess("python3 test.py");
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
