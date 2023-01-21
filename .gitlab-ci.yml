@@ -27,8 +27,12 @@ test:
 build_image:
   stage: build_image
   image: docker:latest
-  only: [main]
+  only:
+  - main
+  services:
+    - name: docker:dind
   script:
+    - echo "Building docker image..."
     - docker build -t codenemy-api-image .
 
 
