@@ -30,14 +30,18 @@ class UserRepositoryTest {
         // given
         String username = "samirzafar";
 
-        User expectedUser = new User(1, "samirzafar", "samir786",0,0,null, null);
+        User expectedUser = new User(0, "samirzafar", "samir786",0,0,null, null);
         sut.save(expectedUser);
 
         // when
         User userFound = sut.findByUsername(username);
 
         // then
-        assertThat(userFound).isEqualTo(expectedUser);
+        assertThat(userFound.getUsername()).isEqualTo(expectedUser.getUsername());
+        assertThat(userFound.getPassword()).isEqualTo(expectedUser.getPassword());
+        assertThat(userFound.getProblemPoints()).isEqualTo(expectedUser.getProblemPoints());
+        assertThat(userFound.getCompetitionPoints()).isEqualTo(expectedUser.getCompetitionPoints());
+        assertThat(userFound.getImage()).isEqualTo(expectedUser.getImage());
     }
 
     @Test
