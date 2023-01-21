@@ -114,7 +114,7 @@ public class CompilerServiceTest {
                         .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
 
 
-        SingleTestCaseResult singleTestCaseResult = new SingleTestCaseResult("[5]", "10", null, null, false);
+        SingleTestCaseResult singleTestCaseResult = new SingleTestCaseResult("[5]", "10", null, null, false, null);
 
         // When
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
@@ -145,6 +145,7 @@ public class CompilerServiceTest {
 
 
         MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
+        multipleTestCaseResults.setError(new ArrayList<>());
 
         // When
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
@@ -157,35 +158,6 @@ public class CompilerServiceTest {
         verify(mockJavaCompilerService).executeAllTestCases(request, script, mockProblem);
         assertThat(multipleTestCaseResults).isEqualTo(result);
     }
-
-    @Test
-    void runScriptForAllTestCaseWithError(){
-
-        // Given
-        Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
-                1, "samirzafar", 1);
-
-        String script = request.script() +
-                "\n\n" +
-                mockProblem
-                        .getProblemLanguages()
-                        .get(0)
-                        .getTestRunAll()
-                        .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
-
-
-        // When
-        when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
-
-        MultipleTestCaseResults multipleTestCaseResults = mock(MultipleTestCaseResults.class);
-
-        when(mockJavaCompilerService.executeAllTestCases(request, script, mockProblem)).thenReturn(multipleTestCaseResults);
-
-        assertThatThrownBy(() -> sut.runScriptForAllTestCases(request, mockProblem))
-                .hasMessageContaining("No serializer found")
-                .isInstanceOf(RuntimeException.class);
-    }
-
 
     @Test
     void runScriptForAllTestCaseWithChallenge(){

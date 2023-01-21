@@ -44,7 +44,7 @@ public class CompilerControllerTest {
         Request request =
                 new Request("java", "helloWorld", 2, "samirzafar", 1);
         SingleTestCaseResult singleTestCaseResult =
-                new SingleTestCaseResult("input", "o", "uo", List.of("oops"), false);
+                new SingleTestCaseResult("input", "o", "uo", List.of("oops"), false, null);
         when(problemService.getProblem(2)).thenReturn(problem);
         when(compilerService.runScriptForOneTestCase(request, problem)).thenReturn(singleTestCaseResult);
 

@@ -17,10 +17,12 @@ public class TestCaseResult {
     private int id;
     private List<String> output;
     private List<String> result;
+    private List<String> error;
 
     public TestCaseResult(int id, List<String> result) {
         this.id = id;
         output = new ArrayList<>();
         this.result = result;
+        error = new ArrayList<>();
     }
 }
