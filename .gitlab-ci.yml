@@ -2,9 +2,12 @@ stages:
   - build
   - test
   - build_image
+  - deploy
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode"
+  HEROKU_APP_NAME: "codenemy-backend"
+  HEROKU_PRODUCTION_KEY: "daabb8a1-d96f-4d7e-94b5-1ffc930e0547"
 
 build:
   stage: build
@@ -34,5 +37,14 @@ build_image:
   script:
     - echo "Building docker image..."
     - docker build -t codenemy-api-image .
+
+heroku_deploy:
+ stage: deploy
+ only:
+  - main
+ image: ruby:latest
+ script:
+  - gem install dpl && gem install faraday -v 1.8.0
+  - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_PRODUCTION_KEY
 
 
