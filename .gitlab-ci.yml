@@ -1,7 +1,6 @@
 stages:
   - build
   - test
-  - build_image
   - deploy
 
 variables:
@@ -26,17 +25,6 @@ test:
       junit:
         - target/surefire-reports/TEST-*.xml
         - target/failsafe-reports/TEST-*.xml
-
-build_image:
-  stage: build_image
-  image: docker:latest
-  only:
-  - main
-  services:
-    - name: docker:dind
-  script:
-    - echo "Building docker image..."
-    - docker build -t codenemy-api-image .
 
 heroku_deploy:
  stage: deploy
