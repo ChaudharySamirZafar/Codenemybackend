@@ -28,6 +28,8 @@ test:
         - target/failsafe-reports/TEST-*.xml
 
 build_image:
+  stage: build_image
+  image: docker:latest
   script:
     - docker build -t my-docker-image .
     - docker run my-docker-image /Dockerfile
