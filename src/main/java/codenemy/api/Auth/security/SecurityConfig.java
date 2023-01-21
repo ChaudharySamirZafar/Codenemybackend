@@ -55,7 +55,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // This is so we can fetch from a React application using local host
         http.cors().configurationSource(request -> {
             var cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3002"));
+            cors.setAllowedOrigins(List.of(
+                    "http://localhost:3000",
+                    "http://localhost:3002",
+                    "https://www.codenemy.com"));
             cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(List.of("*"));
             return cors;
