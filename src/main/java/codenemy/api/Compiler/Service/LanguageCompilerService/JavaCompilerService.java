@@ -3,6 +3,7 @@ package codenemy.api.Compiler.Service.LanguageCompilerService;
 import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
+import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
 import codenemy.api.Util.CompilerUtility;
@@ -25,13 +26,21 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
         compilerUtil.createNewFile("TestRun.java");
         compilerUtil.writeScriptToFile(script);
 
-        compilerUtil.startProcess("javac TestRun.java");
+        Process compileProcess = compilerUtil.startProcess("javac TestRun.java");
         Process process  = compilerUtil.startProcess("java TestRun");
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
+        TestCaseResult compileResult = compilerUtil.retrieveTestCaseResult(request, compileProcess);
+        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
+
         SingleTestCaseResult singleTestCaseResult =
-                compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+                new SingleTestCaseResult(null, null, null, null, false, compileResult.getError());
+
+        if (!(compileResult.getError().size() > 0)) {
+            singleTestCaseResult =
+                    compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
+        }
 
         compilerUtil.deleteFile("TestRun.class");
         compilerUtil.deleteFile("TestRun.java");
@@ -47,13 +56,22 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
         compilerUtil.createNewFile("TestRun.java");
         compilerUtil.writeScriptToFile(script);
 
-        compilerUtil.startProcess("javac TestRun.java");
+        Process compileProcess = compilerUtil.startProcess("javac TestRun.java");
         Process process  = compilerUtil.startProcess("java TestRun");
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
+        TestCaseResult compileResult = compilerUtil.retrieveTestCaseResult(request, compileProcess);
+        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
+
         MultipleTestCaseResults multipleTestCaseResults =
-                compilerUtil.calculateAllTestResultsWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+                new MultipleTestCaseResults();
+        multipleTestCaseResults.setError(compileResult.getError());
+
+        if (!(compileResult.getError().size() > 0)) {
+            multipleTestCaseResults =
+                    compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResult);
+        }
 
         compilerUtil.deleteFile("TestRun.class");
         compilerUtil.deleteFile("TestRun.java");

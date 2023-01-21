@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Transient;
 import java.util.List;
 
 /**
@@ -19,4 +20,6 @@ public class MultipleTestCaseResults {
     private int percentage;
     private int points;
     private int newProblemPoints;
+    @Transient
+    private List<String> error;
 }

@@ -3,9 +3,11 @@ package codenemy.api.Compiler.Service.LanguageCompilerService;
 import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
+import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
 import codenemy.api.Util.CompilerUtility;
+import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader;
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
@@ -28,9 +30,15 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
+        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
 
         SingleTestCaseResult singleTestCaseResult =
-                compilerUtil.calculateSingleTestResultWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+                new SingleTestCaseResult(null, null, null, null, false, testCaseResult.getError());
+
+        if (!(testCaseResult.getError().size() > 0)) {
+           singleTestCaseResult =
+                   compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
+        }
 
         compilerUtil.deleteFile("test.py");
         compilerUtil.deleteFile("results_"+request.username()+".txt");
@@ -48,8 +56,18 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
+        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
+
+        problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
+
         MultipleTestCaseResults multipleTestCaseResults =
-                compilerUtil.calculateAllTestResultsWithResponse(problem, compilerUtil.retrieveTestCaseResult(request, process));
+                new MultipleTestCaseResults();
+        multipleTestCaseResults.setError(testCaseResult.getError());
+
+        if (!(testCaseResult.getError().size() > 0)) {
+            multipleTestCaseResults =
+                    compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResult);
+        }
 
         compilerUtil.deleteFile("test.py");
         compilerUtil.deleteFile("results_"+request.username()+".txt");

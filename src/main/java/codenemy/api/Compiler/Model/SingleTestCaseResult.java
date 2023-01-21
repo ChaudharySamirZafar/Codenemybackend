@@ -7,6 +7,6 @@ import java.util.List;
  * @version 1.0
  * @since 01/01/2023
  */
-public record  SingleTestCaseResult(String input, String expectedOutput, String userOutput, List<String> stdOut, boolean pass){
+public record  SingleTestCaseResult(String input, String expectedOutput, String userOutput, List<String> stdOut, boolean pass, List<String> error){
 
 }

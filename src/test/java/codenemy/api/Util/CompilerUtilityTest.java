@@ -162,20 +162,6 @@ public class CompilerUtilityTest {
     }
 
     @Test
-    void retrieveTestCaseResultFailingResult(){
-        // Given
-        Request request =
-                new Request("java", "", 0, "samirzafartest fail", 0);
-
-        Process process = sut.startProcess("python --version");
-
-        // When & Then
-        assertThatThrownBy(() -> sut.retrieveTestCaseResult(request, process))
-                .hasMessageContaining("java.io.FileNotFoundException")
-                .isInstanceOf(RuntimeException.class);
-    }
-
-    @Test
     void retrieveTestCaseResultFailingOutput() throws IOException {
         // Given
         Request request =

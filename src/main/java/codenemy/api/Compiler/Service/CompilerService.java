@@ -48,19 +48,28 @@ public class CompilerService {
 
         MultipleTestCaseResults multipleTestCaseResults =
                 languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
-
-        ObjectMapper mapper = new ObjectMapper();
-
         String json;
-        try {
-            json = mapper.writeValueAsString(multipleTestCaseResults);
+
+        if (multipleTestCaseResults.getError() == null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                json = mapper.writeValueAsString(multipleTestCaseResults);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
-        catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        else {
+            json = "Code did not compile";
         }
 
         submissionService.addSubmission(
-                new Submission(0, null, problem, LocalDateTime.now(), json, multipleTestCaseResults.getPercentage(), multipleTestCaseResults.getPoints()),
+                new Submission(0,
+                        null,
+                        problem,
+                        LocalDateTime.now(),
+                        json,
+                        multipleTestCaseResults.getPercentage(),
+                        multipleTestCaseResults.getPoints()),
                 request.userId(),
                 multipleTestCaseResults);
 

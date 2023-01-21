@@ -85,6 +85,11 @@ public class CompilerUtility {
                 testCaseResult.getOutput().add(output);
             }
 
+            while ((output = stdError.readLine()) != null) {
+                log.info("Error from user {} : {}", request.username(), output);
+                testCaseResult.getError().add(output);
+            }
+
             stdInput.close();
             stdError.close();
         }
@@ -100,7 +105,7 @@ public class CompilerUtility {
 
         try {
             File file = new File("results_" + request.username() + ".txt");
-            if (file.exists()){
+            if (!file.exists()){
                 file.createNewFile();
             }
             scanner = new Scanner(file);
@@ -109,12 +114,11 @@ public class CompilerUtility {
         }
 
         ArrayList<String> listOfOutput = new ArrayList<>();
+        TestCaseResult testCaseResult = testCaseResult = new TestCaseResult(1, listOfOutput);
 
-        TestCaseResult testCaseResult = null;
         while (scanner.hasNextLine()) {
             String output = scanner.nextLine();
             listOfOutput.add(output);
-            testCaseResult = new TestCaseResult(1, listOfOutput);
         }
 
         scanner.close();
@@ -134,7 +138,8 @@ public class CompilerUtility {
                 firstResult,
                 result.getOutput(),
                 firstTestCase.getOutput()
-                .equals(firstResult));
+                .equals(firstResult),
+                result.getError());
     }
 
     public MultipleTestCaseResults calculateAllTestResultsWithResponse(Problem problem, TestCaseResult result) {
@@ -154,7 +159,8 @@ public class CompilerUtility {
                    output,
                    null,
                    testCase.getOutput()
-                           .equals(output))
+                           .equals(output),
+                   result.getError())
            );
 
            boolean pass = testCase.getOutput().equals(output);

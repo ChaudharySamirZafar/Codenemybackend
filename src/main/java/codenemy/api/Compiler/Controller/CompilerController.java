@@ -33,7 +33,9 @@ public class CompilerController {
 
         Problem problem = problemService.getProblem(request.problemId());
 
-        return ResponseEntity.ok().body(compilerService.runScriptForOneTestCase(request, problem));
+        SingleTestCaseResult singleTestCaseResult = compilerService.runScriptForOneTestCase(request, problem);
+
+        return ResponseEntity.ok().body(singleTestCaseResult);
     }
 
     @PostMapping(path = "/runAllTestCases")

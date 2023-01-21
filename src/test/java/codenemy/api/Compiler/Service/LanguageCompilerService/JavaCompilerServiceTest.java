@@ -55,7 +55,7 @@ public class JavaCompilerServiceTest {
         verify(compilerUtility).deleteFile("TestRun.java");
         verify(compilerUtility).deleteFile("Solution.class");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
-        verify(compilerUtility).retrieveTestCaseResult(request, null);
+        verify(compilerUtility, atLeast(2)).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateSingleTestResultWithResponse(problem, testCaseResult);
     }
 
@@ -83,7 +83,7 @@ public class JavaCompilerServiceTest {
         verify(compilerUtility).deleteFile("TestRun.java");
         verify(compilerUtility).deleteFile("Solution.class");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
-        verify(compilerUtility).retrieveTestCaseResult(request, null);
+        verify(compilerUtility, atLeast(2)).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateAllTestResultsWithResponse(problem, testCaseResult);
     }
 }
