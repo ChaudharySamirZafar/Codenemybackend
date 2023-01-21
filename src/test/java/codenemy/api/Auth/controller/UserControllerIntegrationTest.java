@@ -6,6 +6,8 @@ import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,14 +47,16 @@ public class UserControllerIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-
-        userRepo.deleteAll();
-        roleRepo.deleteAll();
-
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        userRepo.deleteAll();
+        roleRepo.deleteAll();;
     }
 
     @Test
