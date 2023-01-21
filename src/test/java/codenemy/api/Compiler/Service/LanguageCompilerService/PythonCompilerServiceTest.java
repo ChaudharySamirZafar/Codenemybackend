@@ -50,7 +50,7 @@ public class PythonCompilerServiceTest {
         // Then
         verify(compilerUtility).createNewFile("test.py");
         verify(compilerUtility).writeScriptToFile(script);
-        verify(compilerUtility).startProcess("python test.py");
+        verify(compilerUtility).startProcess("python3 test.py");
         verify(compilerUtility).deleteFile("test.py");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
         verify(compilerUtility).retrieveTestCaseResult(request, null);
