@@ -23,23 +23,14 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, String script, Problem problem) {
 
-        compilerUtil.createNewFile("TestRun.java");
-        compilerUtil.writeScriptToFile(script);
-
-        Process compileProcess = compilerUtil.startProcess("javac TestRun.java");
-        Process process  = compilerUtil.startProcess("java TestRun");
-
-        problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
-
-        TestCaseResult compileResult = compilerUtil.retrieveTestCaseResult(request, compileProcess);
-        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
+        TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
 
         SingleTestCaseResult singleTestCaseResult =
-                new SingleTestCaseResult(null, null, null, null, false, compileResult.getError());
+                new SingleTestCaseResult(null, null, null, null, false, testCaseResults[0].getError());
 
-        if (!(compileResult.getError().size() > 0)) {
+        if (!(testCaseResults[0].getError().size() > 0)) {
             singleTestCaseResult =
-                    compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
+                    compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResults[1]);
         }
 
         compilerUtil.deleteFile("TestRun.class");
@@ -53,6 +44,27 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, String script, Problem problem) {
 
+        TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
+
+        MultipleTestCaseResults multipleTestCaseResults =
+                new MultipleTestCaseResults();
+        multipleTestCaseResults.setError(testCaseResults[0].getError());
+
+        if (!(testCaseResults[0].getError().size() > 0)) {
+            multipleTestCaseResults =
+                    compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResults[1]);
+        }
+
+        compilerUtil.deleteFile("TestRun.class");
+        compilerUtil.deleteFile("TestRun.java");
+        compilerUtil.deleteFile("Solution.class");
+        compilerUtil.deleteFile("results_"+request.username()+".txt");
+
+        return multipleTestCaseResults;
+    }
+
+    private TestCaseResult[] createNewFile(Request request, String script, Problem problem) {
+
         compilerUtil.createNewFile("TestRun.java");
         compilerUtil.writeScriptToFile(script);
 
@@ -64,20 +76,6 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
         TestCaseResult compileResult = compilerUtil.retrieveTestCaseResult(request, compileProcess);
         TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
 
-        MultipleTestCaseResults multipleTestCaseResults =
-                new MultipleTestCaseResults();
-        multipleTestCaseResults.setError(compileResult.getError());
-
-        if (!(compileResult.getError().size() > 0)) {
-            multipleTestCaseResults =
-                    compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResult);
-        }
-
-        compilerUtil.deleteFile("TestRun.class");
-        compilerUtil.deleteFile("TestRun.java");
-        compilerUtil.deleteFile("Solution.class");
-        compilerUtil.deleteFile("results_"+request.username()+".txt");
-
-        return multipleTestCaseResults;
+        return new TestCaseResult[]{compileResult, testCaseResult};
     }
 }
