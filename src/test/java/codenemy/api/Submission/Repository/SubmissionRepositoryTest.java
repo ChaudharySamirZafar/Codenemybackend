@@ -52,7 +52,7 @@ public class SubmissionRepositoryTest {
         problemRepository.save(problem);
 
         mockSubmission =
-                new Submission(0, user, problem, LocalDateTime.now(), "", 0,0 );
+                new Submission(0, user, problem, LocalDateTime.now(), "", 100,0 );
         sut.save(mockSubmission);
 
         Set<Integer> result = sut.findSubmissionByUser(user.getId());

@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Integer> {
-    @Query("select s.problem.id from Submission s where s.user.id = :userId")
+    @Query("select s.problem.id from Submission s where s.user.id = :userId and s.percentage = 100")
     Set<Integer> findSubmissionByUser(@Param("userId") int userId);
     @Query("select s from Submission s where s.user.id = :userId and s.problem.id = :problemId order by s.points")
     List<Submission> findSubmissionByUserAndProblem(@Param("userId") int userId, @Param("problemId") int problemId);
