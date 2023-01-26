@@ -10,6 +10,7 @@ import codenemy.api.Util.CompilerUtility;
 import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader;
 import lombok.AllArgsConstructor;
 
+import java.io.File;
 import java.util.Comparator;
 
 /**
@@ -23,10 +24,12 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, String script, Problem problem) {
 
-        compilerUtil.createNewFile("test.py");
-        compilerUtil.writeScriptToFile(script);
+        script = alterScript(script, request.username());
 
-        Process process = compilerUtil.startProcess("python3 test.py");
+        File file = compilerUtil.createNewFile("Solution_"+request.username()+".py");
+        compilerUtil.writeScriptToFile(script, file);
+
+        Process process = compilerUtil.startProcess("python3 Solution_"+request.username()+".py");
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
@@ -40,7 +43,7 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
                    compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
         }
 
-        compilerUtil.deleteFile("test.py");
+        compilerUtil.deleteFile("Solution_"+request.username()+".py");
         compilerUtil.deleteFile("results_"+request.username()+".txt");
 
         return singleTestCaseResult;
@@ -49,10 +52,12 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, String script, Problem problem) {
 
-        compilerUtil.createNewFile("test.py");
-        compilerUtil.writeScriptToFile(script);
+        script = alterScript(script, request.username());
 
-        Process process = compilerUtil.startProcess("python3 test.py");
+        File file = compilerUtil.createNewFile("Solution_"+request.username()+".py");
+        compilerUtil.writeScriptToFile(script, file);
+
+        Process process = compilerUtil.startProcess("python3 Solution_"+request.username()+".py");
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
@@ -69,9 +74,14 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
                     compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResult);
         }
 
-        compilerUtil.deleteFile("test.py");
+        compilerUtil.deleteFile("Solution_"+request.username()+".py");
         compilerUtil.deleteFile("results_"+request.username()+".txt");
 
         return multipleTestCaseResults;
+    }
+
+    private String alterScript(String script, String username) {
+        return script
+                .replace("Solution", "Solution_" + username);
     }
 }

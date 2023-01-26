@@ -47,13 +47,13 @@ public class JavaCompilerServiceTest {
         sut.executeSingleTestCase(request, script, problem);
 
         // Then
-        verify(compilerUtility).createNewFile("TestRun.java");
-        verify(compilerUtility).writeScriptToFile(script);
-        verify(compilerUtility).startProcess("javac TestRun.java");
-        verify(compilerUtility).startProcess("java TestRun");
-        verify(compilerUtility).deleteFile("TestRun.class");
-        verify(compilerUtility).deleteFile("TestRun.java");
-        verify(compilerUtility).deleteFile("Solution.class");
+        verify(compilerUtility).createNewFile("TestRun_testuser.java");
+        verify(compilerUtility).writeScriptToFile(script, null);
+        verify(compilerUtility).startProcess("javac TestRun_testuser.java");
+        verify(compilerUtility).startProcess("java TestRun_testuser");
+        verify(compilerUtility).deleteFile("TestRun_testuser.class");
+        verify(compilerUtility).deleteFile("TestRun_testuser.java");
+        verify(compilerUtility).deleteFile("Solution_testuser.class");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
         verify(compilerUtility, atLeast(2)).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateSingleTestResultWithResponse(problem, testCaseResult);
@@ -75,13 +75,13 @@ public class JavaCompilerServiceTest {
         sut.executeAllTestCases(request, script, problem);
 
         // Then
-        verify(compilerUtility).createNewFile("TestRun.java");
-        verify(compilerUtility).writeScriptToFile(script);
-        verify(compilerUtility).startProcess("javac TestRun.java");
-        verify(compilerUtility).startProcess("java TestRun");
-        verify(compilerUtility).deleteFile("TestRun.class");
-        verify(compilerUtility).deleteFile("TestRun.java");
-        verify(compilerUtility).deleteFile("Solution.class");
+        verify(compilerUtility).createNewFile("TestRun_testuser.java");
+        verify(compilerUtility).writeScriptToFile(script, null);
+        verify(compilerUtility).startProcess("javac TestRun_testuser.java");
+        verify(compilerUtility).startProcess("java TestRun_testuser");
+        verify(compilerUtility).deleteFile("TestRun_testuser.class");
+        verify(compilerUtility).deleteFile("TestRun_testuser.java");
+        verify(compilerUtility).deleteFile("Solution_testuser.class");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
         verify(compilerUtility, atLeast(2)).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateAllTestResultsWithResponse(problem, testCaseResult);

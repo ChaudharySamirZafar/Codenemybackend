@@ -9,6 +9,7 @@ import codenemy.api.Problem.model.TestCase;
 import codenemy.api.Util.CompilerUtility;
 import lombok.AllArgsConstructor;
 
+import java.io.File;
 import java.util.Comparator;
 
 /**
@@ -23,6 +24,8 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, String script, Problem problem) {
 
+        script = alterScript(script, request.username());
+
         TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
 
         SingleTestCaseResult singleTestCaseResult =
@@ -33,9 +36,9 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
                     compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResults[1]);
         }
 
-        compilerUtil.deleteFile("TestRun.class");
-        compilerUtil.deleteFile("TestRun.java");
-        compilerUtil.deleteFile("Solution.class");
+        compilerUtil.deleteFile("TestRun_"+request.username()+".class");
+        compilerUtil.deleteFile("TestRun_"+request.username()+".java");
+        compilerUtil.deleteFile("Solution_"+request.username()+".class");
         compilerUtil.deleteFile("results_"+request.username()+".txt");
 
         return singleTestCaseResult;
@@ -43,6 +46,7 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, String script, Problem problem) {
+        script = alterScript(script, request.username());
 
         TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
 
@@ -55,9 +59,9 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
                     compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResults[1]);
         }
 
-        compilerUtil.deleteFile("TestRun.class");
-        compilerUtil.deleteFile("TestRun.java");
-        compilerUtil.deleteFile("Solution.class");
+        compilerUtil.deleteFile("TestRun_"+request.username()+".class");
+        compilerUtil.deleteFile("TestRun_"+request.username()+".java");
+        compilerUtil.deleteFile("Solution_"+request.username()+".class");
         compilerUtil.deleteFile("results_"+request.username()+".txt");
 
         return multipleTestCaseResults;
@@ -65,11 +69,11 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
     private TestCaseResult[] createNewFile(Request request, String script, Problem problem) {
 
-        compilerUtil.createNewFile("TestRun.java");
-        compilerUtil.writeScriptToFile(script);
+        File file = compilerUtil.createNewFile("TestRun_"+request.username()+".java");
+        compilerUtil.writeScriptToFile(script, file);
 
-        Process compileProcess = compilerUtil.startProcess("javac TestRun.java");
-        Process process  = compilerUtil.startProcess("java TestRun");
+        Process compileProcess = compilerUtil.startProcess("javac TestRun_"+request.username()+".java");
+        Process process  = compilerUtil.startProcess("java TestRun_"+request.username());
 
         problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
 
@@ -77,5 +81,11 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
         TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
 
         return new TestCaseResult[]{compileResult, testCaseResult};
+    }
+
+    private String alterScript(String script, String username) {
+        return script
+                .replace("public class TestRun", "public class TestRun_" + username)
+                .replace("Solution", "Solution_"+username);
     }
 }

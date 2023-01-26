@@ -48,10 +48,10 @@ public class PythonCompilerServiceTest {
         sut.executeSingleTestCase(request, script, problem);
 
         // Then
-        verify(compilerUtility).createNewFile("test.py");
-        verify(compilerUtility).writeScriptToFile(script);
-        verify(compilerUtility).startProcess("python3 test.py");
-        verify(compilerUtility).deleteFile("test.py");
+        verify(compilerUtility).createNewFile("Solution_testuser.py");
+        verify(compilerUtility).writeScriptToFile(script, null);
+        verify(compilerUtility).startProcess("python3 Solution_testuser.py");
+        verify(compilerUtility).deleteFile("Solution_testuser.py");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
         verify(compilerUtility).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateSingleTestResultWithResponse(problem, testCaseResult);
@@ -73,10 +73,10 @@ public class PythonCompilerServiceTest {
         sut.executeAllTestCases(request, script, problem);
 
         // Then
-        verify(compilerUtility).createNewFile("test.py");
-        verify(compilerUtility).writeScriptToFile(script);
-        verify(compilerUtility).startProcess("python3 test.py");
-        verify(compilerUtility).deleteFile("test.py");
+        verify(compilerUtility).createNewFile("Solution_testuser.py");
+        verify(compilerUtility).writeScriptToFile(script, null);
+        verify(compilerUtility).startProcess("python3 Solution_testuser.py");
+        verify(compilerUtility).deleteFile("Solution_testuser.py");
         verify(compilerUtility).deleteFile("results_"+request.username()+".txt");
         verify(compilerUtility).retrieveTestCaseResult(request, null);
         verify(compilerUtility).calculateAllTestResultsWithResponse(problem, testCaseResult);

@@ -24,24 +24,25 @@ public class CompilerUtility {
     static int MEDIUM_POINT_MULTIPLIER = 20;
     static int HARD_POINT_MULTIPLIER = 30;
 
-    private File currentFile = null;
-
-    public void createNewFile(String name){
-        currentFile = new File(name);
+    public File createNewFile(String name){
+        File file = new File(name);
 
         try {
-            if (currentFile.createNewFile()) {
+            if (file.createNewFile()) {
                 log.info("File {} created", name);
             }
         }
         catch (IOException ex) {
             log.info("File {} creation failed", name);
+            return null;
         }
+
+        return file;
     }
 
-    public void writeScriptToFile(String script) {
+    public void writeScriptToFile(String script, File file) {
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(currentFile));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(script);
             bufferedWriter.close();
         }

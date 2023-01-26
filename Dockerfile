@@ -1,5 +1,5 @@
 #
-# Build stage
+# Set Up, Clean & Build stage
 #
 FROM maven:3.8.3-openjdk-17 as build
 COPY src /home/app/src
@@ -10,6 +10,11 @@ RUN mvn -f /home/app/pom.xml clean package
 
 #
 # Package stage
+# Download JDK-17
+# Download Python
+# Copy the Jar file to a file
+# Expose 8080 port
+# Start the jar up.
 #
 FROM amazoncorretto:17
 RUN yum -y install python3 python3-pip

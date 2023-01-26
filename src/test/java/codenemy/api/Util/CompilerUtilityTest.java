@@ -82,10 +82,10 @@ public class CompilerUtilityTest {
         sut.createNewFile("testtest.txt");
 
         // When
-        sut.writeScriptToFile(script);
+        File file = new File("testtest.txt");
+        sut.writeScriptToFile(script, file);
 
         // Then
-        File file = new File("testtest.txt");
         Scanner scanner = new Scanner(file);
 
         String output = scanner.nextLine();
@@ -109,7 +109,7 @@ public class CompilerUtilityTest {
         FileLock lock = channel.lock();
 
         // When
-        sut.writeScriptToFile(script);
+        sut.writeScriptToFile(script, file);
 
         lock.release();
         file.delete();
