@@ -31,9 +31,14 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
         SingleTestCaseResult singleTestCaseResult =
                 new SingleTestCaseResult(null, null, null, null, false, testCaseResults[0].getError());
 
-        if (!(testCaseResults[0].getError().size() > 0)) {
+        if (!(testCaseResults[0].getError().size() > 0) && !(testCaseResults[1].getError().size() > 0)) {
             singleTestCaseResult =
                     compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResults[1]);
+        } else {
+            if (!(testCaseResults[0].getError().size() > 0)) {
+                singleTestCaseResult.error().clear();
+                singleTestCaseResult.error().addAll(testCaseResults[1].getError());
+            }
         }
 
         compilerUtil.deleteFile("TestRun_"+request.username()+".class");
@@ -54,9 +59,14 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
                 new MultipleTestCaseResults();
         multipleTestCaseResults.setError(testCaseResults[0].getError());
 
-        if (!(testCaseResults[0].getError().size() > 0)) {
+        if (!(testCaseResults[0].getError().size() > 0) && !(testCaseResults[1].getError().size() > 0)) {
             multipleTestCaseResults =
                     compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResults[1]);
+        } else {
+            if (!(testCaseResults[0].getError().size() > 0)) {
+                multipleTestCaseResults.getError().clear();
+                multipleTestCaseResults.getError().addAll(testCaseResults[1].getError());
+            }
         }
 
         compilerUtil.deleteFile("TestRun_"+request.username()+".class");
