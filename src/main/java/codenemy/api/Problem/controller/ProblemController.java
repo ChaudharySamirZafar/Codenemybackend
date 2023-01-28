@@ -40,4 +40,9 @@ public class ProblemController {
     public ResponseEntity<Problem> getProblem(@RequestParam int id){
         return ResponseEntity.ok().body(problemService.getProblem(id));
     }
+
+    @GetMapping(path = "/getCount")
+    public ResponseEntity<Integer> getProblemCount(){
+        return ResponseEntity.ok().body(problemService.getAllProblems().size());
+    }
 }
