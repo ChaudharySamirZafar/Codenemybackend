@@ -27,17 +27,7 @@ public class CompilerController {
         this.problemService = problemService;
         this.compilerService = compilerService;
     }
-
-    @PostMapping(path = "/runSingleTestCase")
-    public ResponseEntity<SingleTestCaseResult> runScriptForOneTestCase(@RequestBody Request request) {
-
-        Problem problem = problemService.getProblem(request.problemId());
-
-        SingleTestCaseResult singleTestCaseResult = compilerService.runScriptForOneTestCase(request, problem);
-
-        return ResponseEntity.ok().body(singleTestCaseResult);
-    }
-
+    
     @PostMapping(path = "/runAllTestCases")
     public ResponseEntity<MultipleTestCaseResults> runScriptForAllTestCases(@RequestBody Request request) {
 
@@ -48,5 +38,15 @@ public class CompilerController {
     public ResponseEntity<MultipleTestCaseResults> runScriptForAllTestCasesWithChallenge(@RequestBody Request request) {
 
         return ResponseEntity.ok().body(compilerService.runScriptForAllTestCasesWithChallenge(request, problemService.getProblem(request.problemId())));
+    }
+
+    @PostMapping(path = "/runSingleTestCase")
+    public ResponseEntity<SingleTestCaseResult> runScriptForOneTestCaseVersionTwo(@RequestBody Request request) {
+
+        Problem problem = problemService.getProblem(request.problemId());
+
+        SingleTestCaseResult singleTestCaseResult = compilerService.runScriptForOneTestCaseVersionOne(request, problem);
+
+        return ResponseEntity.ok().body(singleTestCaseResult);
     }
 }

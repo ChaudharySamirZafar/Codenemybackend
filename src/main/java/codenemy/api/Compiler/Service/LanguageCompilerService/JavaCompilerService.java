@@ -1,16 +1,11 @@
 package codenemy.api.Compiler.Service.LanguageCompilerService;
 
-import codenemy.api.Compiler.Model.MultipleTestCaseResults;
-import codenemy.api.Compiler.Model.Request;
-import codenemy.api.Compiler.Model.SingleTestCaseResult;
-import codenemy.api.Compiler.Model.TestCaseResult;
+import codenemy.api.Compiler.Model.*;
 import codenemy.api.Problem.model.Problem;
-import codenemy.api.Problem.model.TestCase;
+import codenemy.api.Problem.model.ProblemLanguage;
 import codenemy.api.Util.CompilerUtility;
 import lombok.AllArgsConstructor;
-
-import java.io.File;
-import java.util.Comparator;
+import java.util.Scanner;
 
 /**
  * @author chaudhary samir zafar
@@ -20,82 +15,54 @@ import java.util.Comparator;
 @AllArgsConstructor
 public class JavaCompilerService implements LanguageCompilerServiceIF {
     CompilerUtility compilerUtil;
+    private static final String JAVA_VERSION = "15.0.2";
 
     @Override
-    public SingleTestCaseResult executeSingleTestCase(Request request, String script, Problem problem) {
+    public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage) {
+        TestCaseResult testCaseResult =
+                compilerUtil.getTestCaseResult
+                        ("TestRun.java", buildFinalScript(request, problemLanguage.getTestRunOne()), request.language(), JAVA_VERSION);
 
-        script = alterScript(script, request.username());
-
-        TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
-
-        SingleTestCaseResult singleTestCaseResult =
-                new SingleTestCaseResult(null, null, null, null, false, testCaseResults[0].getError());
-
-        if (!(testCaseResults[0].getError().size() > 0) && !(testCaseResults[1].getError().size() > 0)) {
-            singleTestCaseResult =
-                    compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResults[1]);
-        } else {
-            if (!(testCaseResults[0].getError().size() > 0)) {
-                singleTestCaseResult.error().clear();
-                singleTestCaseResult.error().addAll(testCaseResults[1].getError());
-            }
+        if (testCaseResult.getError().size() > 0) {
+            return new SingleTestCaseResult(null, null, null, null, false, testCaseResult.getError());
         }
 
-        compilerUtil.deleteFile("TestRun_"+request.username()+".class");
-        compilerUtil.deleteFile("TestRun_"+request.username()+".java");
-        compilerUtil.deleteFile("Solution_"+request.username()+".class");
-        compilerUtil.deleteFile("results_"+request.username()+".txt");
-
-        return singleTestCaseResult;
+        return compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
     }
 
     @Override
-    public MultipleTestCaseResults executeAllTestCases(Request request, String script, Problem problem) {
-        script = alterScript(script, request.username());
+    public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage) {
+        TestCaseResult testCaseResult =
+                compilerUtil.getTestCaseResult
+                        ("TestRun.java", buildFinalScript(request, problemLanguage.getTestRunAll()), request.language(), JAVA_VERSION);
 
-        TestCaseResult[] testCaseResults = createNewFile(request, script, problem);
+        if (testCaseResult.getError().size() > 0) {
+           MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
+           multipleTestCaseResults.setError(testCaseResult.getError());
+           return multipleTestCaseResults;
+        }
 
-        MultipleTestCaseResults multipleTestCaseResults =
-                new MultipleTestCaseResults();
-        multipleTestCaseResults.setError(testCaseResults[0].getError());
+        return compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResult);
+    }
 
-        if (!(testCaseResults[0].getError().size() > 0) && !(testCaseResults[1].getError().size() > 0)) {
-            multipleTestCaseResults =
-                    compilerUtil.calculateAllTestResultsWithResponse(problem, testCaseResults[1]);
-        } else {
-            if (!(testCaseResults[0].getError().size() > 0)) {
-                multipleTestCaseResults.getError().clear();
-                multipleTestCaseResults.getError().addAll(testCaseResults[1].getError());
+    private String buildFinalScript(Request request, String testRunOne) {
+        Scanner scanner = new Scanner(request.script());
+        StringBuilder importStatements = new StringBuilder();
+        StringBuilder code = new StringBuilder();
+
+        while (scanner.hasNext()){
+            String newLine = scanner.nextLine();
+            if (newLine.startsWith("import")) {
+                importStatements.append(newLine).append("\r\n");
+            } else {
+                code.append(newLine).append("\r\n");
             }
         }
 
-        compilerUtil.deleteFile("TestRun_"+request.username()+".class");
-        compilerUtil.deleteFile("TestRun_"+request.username()+".java");
-        compilerUtil.deleteFile("Solution_"+request.username()+".class");
-        compilerUtil.deleteFile("results_"+request.username()+".txt");
+        scanner.close();
 
-        return multipleTestCaseResults;
+        return importStatements + testRunOne + code;
     }
 
-    private TestCaseResult[] createNewFile(Request request, String script, Problem problem) {
 
-        File file = compilerUtil.createNewFile("TestRun_"+request.username()+".java");
-        compilerUtil.writeScriptToFile(script, file);
-
-        Process compileProcess = compilerUtil.startProcess("javac TestRun_"+request.username()+".java");
-        Process process  = compilerUtil.startProcess("java TestRun_"+request.username());
-
-        problem.getTestCases().sort(Comparator.comparing(TestCase::getProblemId));
-
-        TestCaseResult compileResult = compilerUtil.retrieveTestCaseResult(request, compileProcess);
-        TestCaseResult testCaseResult = compilerUtil.retrieveTestCaseResult(request, process);
-
-        return new TestCaseResult[]{compileResult, testCaseResult};
-    }
-
-    private String alterScript(String script, String username) {
-        return script
-                .replace("public class TestRun", "public class TestRun_" + username)
-                .replace("Solution", "Solution_"+username);
-    }
 }
