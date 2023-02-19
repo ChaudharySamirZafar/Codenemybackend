@@ -100,6 +100,9 @@ public class CompilerUtility {
             wr.flush();
             wr.close();
 
+            // Add throttling
+            Thread.sleep(3000); // wait for 1 second before sending the request
+
             // Get the response
             int responseCode = con.getResponseCode();
 
