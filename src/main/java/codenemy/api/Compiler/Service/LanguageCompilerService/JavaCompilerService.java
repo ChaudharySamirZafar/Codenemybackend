@@ -1,10 +1,14 @@
 package codenemy.api.Compiler.Service.LanguageCompilerService;
 
-import codenemy.api.Compiler.Model.*;
+import codenemy.api.Compiler.Model.MultipleTestCaseResults;
+import codenemy.api.Compiler.Model.Request;
+import codenemy.api.Compiler.Model.SingleTestCaseResult;
+import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.ProblemLanguage;
 import codenemy.api.Util.CompilerUtility;
 import lombok.AllArgsConstructor;
+
 import java.util.Scanner;
 
 /**

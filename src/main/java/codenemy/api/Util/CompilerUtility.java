@@ -1,18 +1,22 @@
 package codenemy.api.Util;
 
-import codenemy.api.Compiler.Model.*;
+import codenemy.api.Compiler.Model.MultipleTestCaseResults;
 import codenemy.api.Compiler.Model.Piston.PistonFile;
 import codenemy.api.Compiler.Model.Piston.PistonRequest;
 import codenemy.api.Compiler.Model.Piston.PistonResponse;
+import codenemy.api.Compiler.Model.SingleTestCaseResult;
+import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,10 +47,15 @@ public class CompilerUtility {
             return null;
         }
 
-        if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()) {
+        if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()
+                || pistonResponse.run().signal() != null) {
             // Get the errors.
-            List<String> errors = Arrays.asList(pistonResponse.run().stderr().split("\n"));
-            testCaseResult.setError(errors);
+            if (pistonResponse.run().signal().equalsIgnoreCase("SIGKILL")) {
+                testCaseResult.setError(List.of("Your code exceeded the runtime time limit\n"));
+            } else {
+                List<String> errors = Arrays.asList(pistonResponse.run().stderr().split("\n"));
+                testCaseResult.setError(errors);
+            }
             return testCaseResult;
         }
 
@@ -69,32 +78,52 @@ public class CompilerUtility {
     }
 
     public PistonResponse makeRequest(PistonRequest requestData) {
-        WebClient client = WebClient.builder()
-                .baseUrl("https://emkc.org/api/v2/piston")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+        String url = "https://emkc.org/api/v2/piston/execute";
 
-        Mono<Object> result = client.post()
-                .uri("/execute")
-                .body(Mono.just(requestData), PistonRequest.class)
-                .exchangeToMono(response -> {
+        URL obj = null;
+        HttpURLConnection con = null;
 
-                    if (response.statusCode().equals(HttpStatus.OK)) {
-                        return response.bodyToMono(PistonResponse.class);
-                    } else {
-                        return Mono.just("Error response");
-                    }
-                });
+        try {
+            obj = new URL(url);
+            con = (HttpURLConnection) obj.openConnection();
 
-        Object resultObject = result.block();
+            // Set the request method and headers
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
 
-        assert resultObject != null;
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        if (resultObject.getClass().equals(String.class)) {
-            return null;
+            // Set the request body
+            String requestBody = objectMapper.writeValueAsString(requestData);
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(requestBody);
+            wr.flush();
+            wr.close();
+
+            // Get the response
+            int responseCode = con.getResponseCode();
+
+            // Check if the response is okay
+            if (responseCode == HttpStatus.OK.value()) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+
+                in.close();
+
+                // Deserialize the response
+                return objectMapper.readValue(response.toString(), PistonResponse.class);
+            }
+        }
+        catch (Exception exception) {
+            log.info(exception.getMessage());
         }
 
-        return (PistonResponse) result.block();
+        return null;
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
