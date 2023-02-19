@@ -2,6 +2,7 @@ package codenemy.api.Compiler.Service;
 
 
 import codenemy.api.Compiler.Service.LanguageCompilerService.JavaCompilerService;
+import codenemy.api.Compiler.Service.LanguageCompilerService.JavaScriptCompilerService;
 import codenemy.api.Compiler.Service.LanguageCompilerService.LanguageCompilerServiceIF;
 import codenemy.api.Compiler.Service.LanguageCompilerService.PythonCompilerService;
 import codenemy.api.Util.CompilerUtility;
@@ -24,6 +25,9 @@ public class CompilerServiceFactory {
             }
             case "python", "Python", "python3", "Python3" -> {
                 return new PythonCompilerService(new CompilerUtility());
+            }
+            case "javascript", "js", "JavaScript" -> {
+                return new JavaScriptCompilerService(new CompilerUtility());
             }
             default -> throw new NotYetImplementedException(language + " does not have a compiler service yet.");
         }

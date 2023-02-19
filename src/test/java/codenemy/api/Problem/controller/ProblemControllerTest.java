@@ -177,4 +177,25 @@ public class ProblemControllerTest {
         assertEquals(problemArrayList.get(1), resultTwo.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
+
+    @Test
+    void getCount(){
+
+        // Given
+        // Create an arraylist
+        ArrayList<Problem> problemArrayList = new ArrayList<>();
+        for(int i = 0; i < 2; i++) {
+            problemArrayList
+                    .add(new Problem(i, "problem"+i, "description"+i, List.of(new Tag(i, "tag" + i)), null,
+                            null, "easy", false));
+        }
+
+        when(problemService.getAllProblems()).thenReturn(problemArrayList);
+
+        // When
+        ResponseEntity<Integer> result = sut.getProblemCount();
+
+        // Then
+        assertEquals(problemArrayList.size(), result.getBody());
+    }
 }

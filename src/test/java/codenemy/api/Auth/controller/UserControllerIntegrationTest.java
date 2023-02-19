@@ -6,7 +6,6 @@ import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

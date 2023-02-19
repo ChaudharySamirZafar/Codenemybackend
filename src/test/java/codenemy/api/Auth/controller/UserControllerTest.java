@@ -115,7 +115,7 @@ public class UserControllerTest {
     @Test
     void registerUser() throws IOException {
         // Given
-        User user = new User(0, "testuser", "testpassword", 1000, 1500, null,
+        User user = new User(0, "testuser", "testpassword", 1000, 1500, new byte[0],
                 new ArrayList<>());
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();

@@ -49,7 +49,7 @@ public class CompilerControllerTest {
         when(compilerService.runScriptForOneTestCase(request, problem)).thenReturn(singleTestCaseResult);
 
         // When
-        ResponseEntity<SingleTestCaseResult>  result = sut.runScriptForOneTestCase(request);
+        ResponseEntity<SingleTestCaseResult>  result = sut.runScriptForOneTestCaseVersionTwo(request);
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());

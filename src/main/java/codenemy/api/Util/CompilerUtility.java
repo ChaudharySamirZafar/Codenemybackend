@@ -1,17 +1,26 @@
 package codenemy.api.Util;
 
 import codenemy.api.Compiler.Model.MultipleTestCaseResults;
-import codenemy.api.Compiler.Model.Request;
+import codenemy.api.Compiler.Model.Piston.PistonFile;
+import codenemy.api.Compiler.Model.Piston.PistonRequest;
+import codenemy.api.Compiler.Model.Piston.PistonResponse;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+
 
 /**
  * @author chaudhary samir zafar
@@ -24,107 +33,97 @@ public class CompilerUtility {
     static int MEDIUM_POINT_MULTIPLIER = 20;
     static int HARD_POINT_MULTIPLIER = 30;
 
-    public File createNewFile(String name){
-        File file = new File(name);
+    public TestCaseResult getTestCaseResult(String fileName, String fileContent, String programmingLang, String version) {
+        TestCaseResult testCaseResult = new TestCaseResult(0, null);
 
-        try {
-            if (file.createNewFile()) {
-                log.info("File {} created", name);
-            }
-        }
-        catch (IOException ex) {
-            log.info("File {} creation failed", name);
+        List<PistonFile> fileArrayList = List.of(new PistonFile(fileName, fileContent));
+        PistonRequest pistonRequest = new PistonRequest(programmingLang, fileArrayList);
+        pistonRequest.setVersion(version);
+
+        PistonResponse pistonResponse = makeRequest(pistonRequest);
+
+        if (pistonResponse == null) {
+            log.info("The request to piston is breaking.");
             return null;
         }
 
-        return file;
+        if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()
+                || pistonResponse.run().signal() != null) {
+            // Get the errors.
+            if (pistonResponse.run().signal().equalsIgnoreCase("SIGKILL")) {
+                testCaseResult.setError(List.of("Your code exceeded the runtime time limit\n"));
+            } else {
+                List<String> errors = Arrays.asList(pistonResponse.run().stderr().split("\n"));
+                testCaseResult.setError(errors);
+            }
+            return testCaseResult;
+        }
+
+        String[] arrOfStdOut = pistonResponse.run().stdout().split("\n");
+        ArrayList<String> result = new ArrayList<>();
+        ArrayList<String> output = new ArrayList<>();
+
+        for(String s : arrOfStdOut) {
+            if (s.startsWith("Result - ")) {
+                result.add(s.replace("Result - ", ""));
+            } else {
+                output.add(s + "\n");
+            }
+        }
+
+        testCaseResult.setOutput(output);
+        testCaseResult.setResult(result);
+
+        return testCaseResult;
     }
 
-    public void writeScriptToFile(String script, File file) {
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-            bufferedWriter.write(script);
-            bufferedWriter.close();
-        }
-        catch (IOException ignored) {
-            log.info("Failed writing script to file");
-        }
-    }
+    public PistonResponse makeRequest(PistonRequest requestData) {
+        String url = "https://emkc.org/api/v2/piston/execute";
 
-    public Process startProcess(String command){
-        Process process = null;
+        URL obj = null;
+        HttpURLConnection con = null;
 
         try {
-            process = Runtime.getRuntime().exec(command);
-            process.waitFor();
+            obj = new URL(url);
+            con = (HttpURLConnection) obj.openConnection();
+
+            // Set the request method and headers
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Set the request body
+            String requestBody = objectMapper.writeValueAsString(requestData);
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(requestBody);
+            wr.flush();
+            wr.close();
+
+            // Get the response
+            int responseCode = con.getResponseCode();
+
+            // Check if the response is okay
+            if (responseCode == HttpStatus.OK.value()) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+
+                in.close();
+
+                // Deserialize the response
+                return objectMapper.readValue(response.toString(), PistonResponse.class);
+            }
         }
         catch (Exception exception) {
-            log.info("Exception in process");
-            log.info("Command {} ", command);
+            log.info(exception.getMessage());
         }
 
-        return process;
-    }
-
-    public TestCaseResult retrieveTestCaseResult(Request request, Process process) {
-
-        TestCaseResult testCaseResult = retrieveScriptReturnValues(request);
-
-        String output;
-
-        BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdError = new BufferedReader(new
-                InputStreamReader(process.getErrorStream()));
-
-        try {
-            while ((output = stdInput.readLine()) != null) {
-                log.info("Output from user {} : {}", request.username(), output);
-                // Add output here.
-                assert testCaseResult != null;
-                testCaseResult.getOutput().add(output);
-            }
-
-            while ((output = stdError.readLine()) != null) {
-                log.info("Error from user {} : {}", request.username(), output);
-                testCaseResult.getError().add(output);
-            }
-
-            stdInput.close();
-            stdError.close();
-        }
-        catch (IOException exception) {
-            log.info("Error reading the data");
-        }
-
-        return testCaseResult;
-    }
-
-    private TestCaseResult retrieveScriptReturnValues(Request request) {
-        Scanner scanner;
-
-        try {
-            File file = new File("results_" + request.username() + ".txt");
-            if (!file.exists()){
-                file.createNewFile();
-            }
-            scanner = new Scanner(file);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
-
-        ArrayList<String> listOfOutput = new ArrayList<>();
-        TestCaseResult testCaseResult = testCaseResult = new TestCaseResult(1, listOfOutput);
-
-        while (scanner.hasNextLine()) {
-            String output = scanner.nextLine();
-            listOfOutput.add(output);
-        }
-
-        scanner.close();
-
-        return testCaseResult;
+        return null;
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
@@ -138,8 +137,7 @@ public class CompilerUtility {
                 firstTestCase.getOutput(),
                 firstResult,
                 result.getOutput(),
-                firstTestCase.getOutput()
-                .equals(firstResult),
+                firstTestCase.getOutput().equals(firstResult),
                 result.getError());
     }
 
@@ -186,16 +184,5 @@ public class CompilerUtility {
             case "Hard", "hard" -> HARD_POINT_MULTIPLIER;
             default -> EASY_POINT_MULTIPLIER;
         };
-    }
-
-    public void deleteFile(String name){
-        File file = new File(name);
-
-        if (file.delete()){
-            log.info("File {} deleted", name);
-        }
-        else {
-            log.info("File {} not deleted", name);
-        }
     }
 }

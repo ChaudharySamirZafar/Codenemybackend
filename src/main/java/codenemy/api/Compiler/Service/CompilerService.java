@@ -25,18 +25,16 @@ import java.time.LocalDateTime;
 public class CompilerService {
     private CompilerServiceFactory compilerServiceFactory;
     private SubmissionService submissionService;
+    private ObjectMapper objectMapper;
 
     public SingleTestCaseResult runScriptForOneTestCase(Request request, Problem problem) {
-
         // Retrieve the correct and appropriate compiler service
         LanguageCompilerServiceIF languageCompilerServiceIF = compilerServiceFactory.getSpecificLanguageCompilerService(request.language());
 
         // First find the problem Lang
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
 
-        String editedTestScript = editTestScript(request, problemLanguage, true);
-
-        return languageCompilerServiceIF.executeSingleTestCase(request, editedTestScript, problem);
+        return languageCompilerServiceIF.executeSingleTestCase(request, problem, problemLanguage);
     }
 
     public MultipleTestCaseResults runScriptForAllTestCases(Request request, Problem problem) {
@@ -47,13 +45,12 @@ public class CompilerService {
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
 
         MultipleTestCaseResults multipleTestCaseResults =
-                languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
+                languageCompilerServiceIF.executeAllTestCases(request, problem, problemLanguage);
         String json;
 
         if (multipleTestCaseResults.getError() == null) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
-                json = mapper.writeValueAsString(multipleTestCaseResults);
+                json = objectMapper.writeValueAsString(multipleTestCaseResults);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -83,7 +80,7 @@ public class CompilerService {
         // First find the problem Lang
         ProblemLanguage problemLanguage = findProblemLanguageSelected(problem, request.language());
 
-        return languageCompilerServiceIF.executeAllTestCases(request, editTestScript(request, problemLanguage, false), problem);
+        return languageCompilerServiceIF.executeAllTestCases(request, problem, problemLanguage);
     }
 
     private ProblemLanguage findProblemLanguageSelected(Problem problem, String selectedLang){
@@ -92,21 +89,5 @@ public class CompilerService {
                         .filter(element -> element.getLanguage().getProgrammingLanguage().equalsIgnoreCase(selectedLang))
                         .findAny()
                         .get();
-    }
-
-    private String editTestScript(Request request, ProblemLanguage problemLanguage, boolean testRunOne){
-        return testRunOne
-            ?
-        request.script() +
-            "\n\n" +
-            problemLanguage
-                .getTestRunOne()
-                .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt")
-            :
-        request.script() +
-            "\n\n" +
-            problemLanguage
-                .getTestRunAll()
-                .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
     }
 }
