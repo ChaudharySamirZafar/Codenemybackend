@@ -3,8 +3,6 @@
 #
 FROM maven:3.8.3-openjdk-17 as build
 COPY src /home/app/src
-COPY results_samirzafartest.txt /home/app
-COPY TestFile.java /home/app
 COPY pom.xml /home/app
 RUN mvn -f /home/app/pom.xml clean package
 
