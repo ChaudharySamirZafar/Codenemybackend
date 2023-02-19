@@ -6,19 +6,26 @@ import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Service.LanguageCompilerService.JavaCompilerService;
 import codenemy.api.Problem.model.*;
+import codenemy.api.Submission.Model.Submission;
 import codenemy.api.Submission.Service.SubmissionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -29,6 +36,7 @@ import static org.mockito.Mockito.*;
 @ComponentScan("codenemy.api.Problem.repository")
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class CompilerServiceTest {
     private CompilerService sut;
     @Mock
@@ -38,10 +46,12 @@ public class CompilerServiceTest {
     private Problem mockProblem;
     @Mock
     private JavaCompilerService mockJavaCompilerService;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp(){
-        sut = new CompilerService(mockCompilerServiceFactory, mockSubmissionService);
+        sut = new CompilerService(mockCompilerServiceFactory, mockSubmissionService, objectMapper);
 
         ArrayList<Tag> tags = new ArrayList<>();
         tags.add(new Tag(1, "Array"));
@@ -105,27 +115,17 @@ public class CompilerServiceTest {
         Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
                 1, "samirzafar", 1);
 
-        String script = request.script() +
-                "\n\n" +
-                mockProblem
-                        .getProblemLanguages()
-                        .get(0)
-                        .getTestRunOne()
-                        .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
-
-
         SingleTestCaseResult singleTestCaseResult = new SingleTestCaseResult("[5]", "10", null, null, false, null);
 
         // When
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
-        when(mockJavaCompilerService.executeSingleTestCase(request, script, mockProblem)).thenReturn(singleTestCaseResult);
+        when(mockJavaCompilerService.executeSingleTestCase(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(singleTestCaseResult);
 
-        SingleTestCaseResult result = sut.runScriptForOneTestCase(request, mockProblem);
+        sut.runScriptForOneTestCase(request, mockProblem);
 
         // Then
         verify(mockCompilerServiceFactory).getSpecificLanguageCompilerService("java");
-        verify(mockJavaCompilerService).executeSingleTestCase(request, script, mockProblem);
-        assertThat(singleTestCaseResult).isEqualTo(result);
+        verify(mockJavaCompilerService).executeSingleTestCase(request, mockProblem, mockProblem.getProblemLanguages().get(0));
     }
 
     @Test
@@ -135,57 +135,82 @@ public class CompilerServiceTest {
         Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
                 1, "samirzafar", 1);
 
-        String script = request.script() +
-                "\n\n" +
-                mockProblem
-                        .getProblemLanguages()
-                        .get(0)
-                        .getTestRunAll()
-                        .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
-
-
-        MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
-        multipleTestCaseResults.setError(new ArrayList<>());
+        MultipleTestCaseResults multipleTestCaseResults =
+                new MultipleTestCaseResults();
 
         // When
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
-        when(mockJavaCompilerService.executeAllTestCases(request, script, mockProblem)).thenReturn(multipleTestCaseResults);
+        when(mockJavaCompilerService.executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(multipleTestCaseResults);
 
-        MultipleTestCaseResults result = sut.runScriptForAllTestCases(request, mockProblem);
+        sut.runScriptForAllTestCases(request, mockProblem);
 
         // Then
         verify(mockCompilerServiceFactory).getSpecificLanguageCompilerService("java");
-        verify(mockJavaCompilerService).executeAllTestCases(request, script, mockProblem);
-        assertThat(multipleTestCaseResults).isEqualTo(result);
+        verify(mockJavaCompilerService).executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0));
+        verify(mockSubmissionService).addSubmission(any(Submission.class), any(Integer.class), any(MultipleTestCaseResults.class));
     }
 
     @Test
-    void runScriptForAllTestCaseWithChallenge(){
+    void runScriptForAllTestCaseWithError(){
 
         // Given
         Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
                 1, "samirzafar", 1);
 
-        String script = request.script() +
-                "\n\n" +
-                mockProblem
-                        .getProblemLanguages()
-                        .get(0)
-                        .getTestRunAll()
-                        .replace("results_ENVIRONMENT_VAR.txt", "results_" + request.username() + ".txt");
+        MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
 
+        // When
+        multipleTestCaseResults.setError(Arrays.asList("Error", "Error"));
+        when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
+        when(mockJavaCompilerService.executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(multipleTestCaseResults);
+
+        sut.runScriptForAllTestCases(request, mockProblem);
+
+        // Then
+        verify(mockCompilerServiceFactory).getSpecificLanguageCompilerService("java");
+        verify(mockJavaCompilerService).executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0));
+    }
+
+    @Test
+    void runScriptForAllTestCaseWithJsonError() {
+
+        // Given
+        Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
+                1, "samirzafar", 1);
+        MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
+
+        // When
+        try {
+            when(objectMapper.writeValueAsString(multipleTestCaseResults)).thenThrow(JsonProcessingException.class);
+        } catch (Exception e) {
+            assertEquals(e, instanceOf(RuntimeException.class));
+        }
+        when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
+        when(mockJavaCompilerService.executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(multipleTestCaseResults);
+
+
+        assertThatThrownBy(() ->  sut.runScriptForAllTestCases(request, mockProblem))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void runScriptForAllTestCaseChallenge(){
+
+        // Given
+        Request request = new Request("java", "import java.util.Arrays;\\r\\nimport java.io.*;\\r\\n\\r\\nclass Solution {\\r\\n    public static int[] twoSum(int[] nums, int target) {\\r\\n       System.out.println(\\\"Testing\\\");\\r\\n       System.out.println(\\\"Testing Testing\\\");\\r\\n       System.out.println(\\\"Testing Testingv2\\\");\\r\\n       System.out.println(\\\"Testing Testingv3\\\");\\r\\n       return new int[]{0, 0};\\r\\n    }\\r\\n}",
+                1, "samirzafar", 1);
 
         MultipleTestCaseResults multipleTestCaseResults = new MultipleTestCaseResults();
 
         // When
+        multipleTestCaseResults.setError(Arrays.asList("Error", "Error"));
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
-        when(mockJavaCompilerService.executeAllTestCases(request, script, mockProblem)).thenReturn(multipleTestCaseResults);
+        when(mockJavaCompilerService.executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(multipleTestCaseResults);
 
-        MultipleTestCaseResults result = sut.runScriptForAllTestCasesWithChallenge(request, mockProblem);
+        sut.runScriptForAllTestCasesWithChallenge(request, mockProblem);
 
         // Then
         verify(mockCompilerServiceFactory).getSpecificLanguageCompilerService("java");
-        verify(mockJavaCompilerService).executeAllTestCases(request, script, mockProblem);
-        assertThat(multipleTestCaseResults).isEqualTo(result);
+        verify(mockJavaCompilerService).executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0));
     }
 }

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author chaudhary samir zafar
@@ -30,7 +29,6 @@ public class CompilerUtility {
     static int MEDIUM_POINT_MULTIPLIER = 20;
     static int HARD_POINT_MULTIPLIER = 30;
 
-
     public TestCaseResult getTestCaseResult(String fileName, String fileContent, String programmingLang, String version) {
         TestCaseResult testCaseResult = new TestCaseResult(0, null);
 
@@ -39,6 +37,11 @@ public class CompilerUtility {
         pistonRequest.setVersion(version);
 
         PistonResponse pistonResponse = makeRequest(pistonRequest);
+
+        if (pistonResponse == null) {
+            log.info("The request to piston is breaking.");
+            return null;
+        }
 
         if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()) {
             // Get the errors.
@@ -78,12 +81,18 @@ public class CompilerUtility {
 
                     if (response.statusCode().equals(HttpStatus.OK)) {
                         return response.bodyToMono(PistonResponse.class);
-                    } else if (response.statusCode().is4xxClientError()) {
-                        return Mono.just("Error response");
                     } else {
-                        return response.createException().flatMap(Mono::error);
+                        return Mono.just("Error response");
                     }
                 });
+
+        Object resultObject = result.block();
+
+        assert resultObject != null;
+
+        if (resultObject.getClass().equals(String.class)) {
+            return null;
+        }
 
         return (PistonResponse) result.block();
     }
@@ -99,8 +108,7 @@ public class CompilerUtility {
                 firstTestCase.getOutput(),
                 firstResult,
                 result.getOutput(),
-                firstTestCase.getOutput()
-                .equals(firstResult),
+                firstTestCase.getOutput().equals(firstResult),
                 result.getError());
     }
 

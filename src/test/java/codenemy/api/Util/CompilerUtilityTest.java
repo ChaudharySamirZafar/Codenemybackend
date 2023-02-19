@@ -1,24 +1,17 @@
 package codenemy.api.Util;
 
 import codenemy.api.Compiler.Model.MultipleTestCaseResults;
-import codenemy.api.Compiler.Model.Request;
 import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -34,146 +27,9 @@ public class CompilerUtilityTest {
         sut = new CompilerUtility();
     }
 
-    @Test
-    void startProcessWithError() {
-        sut.startProcess("java --version");
-    }
-
-    @Test
-    void startProcessWithOutError() {
-        Process result = sut.startProcess("testingWithStupidProcess");
-
-        assertNull(result);
-    }
-
-    @Test
-    void createAndDeleteNewFileWithoutError(){
-        // Given
-        String testFileName = "test.txt";
-
-        // When
-        sut.createNewFile(testFileName);
-
-        // Then
-        File file = new File(testFileName);
-        assertNotNull(file);
-        assertEquals(testFileName, file.getName());
-
-        file.delete();
-    }
-
-    @Test
-    void createNewFileWithError(){
-        // Given
-        String invalidFileName = "foo.exe\0. png";
-
-        // When
-        sut.createNewFile(invalidFileName);
-
-        // Then
-        File file = new File(invalidFileName);
-        assertFalse(file.exists());
-    }
-
-    @Test
-    void writeScriptToFileWithNoError() throws FileNotFoundException {
-        // Given
-        String script = "Hello World";
-        sut.createNewFile("testtest.txt");
-
-        // When
-        File file = new File("testtest.txt");
-        sut.writeScriptToFile(script, file);
-
-        // Then
-        Scanner scanner = new Scanner(file);
-
-        String output = scanner.nextLine();
-        assertEquals(output, script);
-
-        scanner.close();
-        file.delete();
-    }
-
-    @Test
-    void writeScriptToFileWithError() throws IOException {
-        // Given
-        String script = "Hello World";
-        sut.createNewFile("test.txt");
-        File file = new File("test.txt");
-
-        FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
-
-        // Use the file channel to create a lock on the file.
-        // This method blocks until it can retrieve the lock.
-        FileLock lock = channel.lock();
-
-        // When
-        sut.writeScriptToFile(script, file);
-
-        lock.release();
-        file.delete();
-    }
-
-    @Test
-    void deleteFile() throws IOException {
-        // Given
-        File file = new File("testv1.txt");
-        file.createNewFile();
-
-        // when
-        sut.deleteFile(file.getName());
-
-        // then
-        assertFalse(file.exists());
-    }
-
-    @Test
-    void doNotDeleteFile() throws IOException {
-        // Given
-        File file = new File("testv12.txt");
-        file.createNewFile();
-
-        // when
-        sut.deleteFile("testNotToDelete.txt");
-
-        // then
-        assertTrue(file.exists());
-        file.delete();
-    }
-
-    @Test
-    void retrieveTestCaseResult(){
-        // Given
-        Request request =
-                new Request("java", "", 0, "samirzafartest", 0);
-
-        Process process = sut.startProcess("java TestFile.java");
-
-        // When
-        TestCaseResult result = sut.retrieveTestCaseResult(request, process);
-
-        // Then
-        assertEquals(1, result.getResult().size());
-        assertEquals("[0,1]", result.getResult().get(0));
-
-        assertEquals(1, result.getOutput().size());
-        assertEquals("Hello World", result.getOutput().get(0));
-    }
-
-    @Test
-    void retrieveTestCaseResultFailingOutput() throws IOException {
-        // Given
-        Request request =
-                new Request("java", "", 0, "samirzafartest", 0);
-
-        Process process = sut.startProcess("java TestFile.java");
-
-        process.getInputStream().close();
-
-        // When & Then
-        sut.retrieveTestCaseResult(request, process);
-
+    @AfterEach
+    void tearDown() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
     }
 
     @Test
@@ -310,4 +166,53 @@ public class CompilerUtilityTest {
         assertEquals(66, result.getPercentage());
         assertEquals(1980, result.getPoints());
     }
+
+    @Test
+    void getTestCaseResultWithError(){
+        // Given
+        String fileName = "TestRun.py";
+        String fileContent = "class Solution {\\r\\n    twoSum(nums, target){\\r\\n      let indexes = [];\\r\\n  \\r\\n      for(let i = 0; i < nums.length; i++){\\r\\n           for(let j = i + 1; j < nums.length; j++){\\r\\n              if (nums[i] + nums[j] === target) {\\r\\n            indexes.push(i);\\r\\n            indexes.push(j);\\r\\n              }\\r\\n           }\\r\\n      }\\r\\n    \\r\\n      return indexes;\\r\\n    }\\r\\n}\\r\\n\\r\\nsolution = new Solution();\\r\\nnums = [2, 7, 11, 15]\\r\\ntarget = 9\\r\\nconsole.log(\\\"\\\\nResult - [\\\" + solution.twoSum(nums, target) + \\\"]\\\");";
+        String programmingLang = "java";
+        String version = "15.0.2";
+
+        // When
+        TestCaseResult testCaseResult = sut.getTestCaseResult(fileName, fileContent, programmingLang, version);
+
+        // Then
+        assertTrue(testCaseResult.getError().size() > 0);
+    }
+
+    @Test
+    void getTestCaseResult(){
+        // Given
+        String expectedOutput = "Sum of x+y = 35\n";
+        String expectedResult = "35";
+        String fileName = "TestRun.java";
+        String fileContent = "public class MyClass {\n    public static void main(String args[]) {\n      int x=10;\n      int y=25;\n      int z=x+y;\n\n      System.out.println(\"Sum of x+y = \" + z);\n      System.out.println(\"Result - \" + z);\n    }\n}";
+        String programmingLang = "java";
+        String version = "15.0.2";
+
+        // When
+        TestCaseResult testCaseResult = sut.getTestCaseResult(fileName, fileContent, programmingLang, version);
+
+        // Then
+        assertEquals(1, testCaseResult.getOutput().size());
+        assertEquals(1, testCaseResult.getResult().size());
+        assertEquals(expectedOutput, testCaseResult.getOutput().get(0));
+        assertEquals(expectedResult, testCaseResult.getResult().get(0));
+    }
+
+    @Test
+    void getTestCaseResultWithHttpError(){
+        // Given
+        String fileName = "TestRun.java";
+        String fileContent = "class Solution {\\r\\n    twoSum(nums, target){\\r\\n      let indexes = [];\\r\\n  \\r\\n      for(let i = 0; i < nums.length; i++){\\r\\n           for(let j = i + 1; j < nums.length; j++){\\r\\n              if (nums[i] + nums[j] === target) {\\r\\n            indexes.push(i);\\r\\n            indexes.push(j);\\r\\n              }\\r\\n           }\\r\\n      }\\r\\n    \\r\\n      return indexes;\\r\\n    }\\r\\n}\\r\\n\\r\\nsolution = new Solution();\\r\\nnums = [2, 7, 11, 15]\\r\\ntarget = 9\\r\\nconsole.log(\\\"\\\\nResult - [\\\" + solution.twoSum(nums, target) + \\\"]\\\");";
+        String programmingLang = "";
+        String version = "15.0.2";
+
+        // When
+        TestCaseResult testCaseResult = sut.getTestCaseResult(fileName, fileContent, programmingLang, version);
+
+    }
+
 }

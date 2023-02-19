@@ -1,8 +1,5 @@
 package codenemy.api.Compiler.Model.Piston;
 
-import codenemy.api.Compiler.Model.Piston.PistonFile;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class PistonRequest {
@@ -31,10 +28,6 @@ public class PistonRequest {
         return language;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
     public String getVersion() {
         return version;
     }
@@ -47,23 +40,12 @@ public class PistonRequest {
         return files;
     }
 
-    public void setFiles(ArrayList<PistonFile> files) {
-        this.files = files;
-    }
 
     public String getStdin() {
         return stdin;
     }
 
-    public void setStdin(String stdin) {
-        this.stdin = stdin;
-    }
-
     public String getArgs() {
         return args;
-    }
-
-    public void setArgs(String args) {
-        this.args = args;
     }
 }

@@ -22,8 +22,9 @@ import java.time.LocalDateTime;
 public class CompilerService {
     private CompilerServiceFactory compilerServiceFactory;
     private SubmissionService submissionService;
+    private ObjectMapper objectMapper;
 
-    public SingleTestCaseResult runScriptForOneTestCaseVersionOne(Request request, Problem problem) {
+    public SingleTestCaseResult runScriptForOneTestCase(Request request, Problem problem) {
         // Retrieve the correct and appropriate compiler service
         LanguageCompilerServiceIF languageCompilerServiceIF = compilerServiceFactory.getSpecificLanguageCompilerService(request.language());
 
@@ -45,9 +46,8 @@ public class CompilerService {
         String json;
 
         if (multipleTestCaseResults.getError() == null) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
-                json = mapper.writeValueAsString(multipleTestCaseResults);
+                json = objectMapper.writeValueAsString(multipleTestCaseResults);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

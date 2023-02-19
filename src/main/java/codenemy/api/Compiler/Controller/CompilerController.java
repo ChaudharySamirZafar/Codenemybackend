@@ -45,7 +45,7 @@ public class CompilerController {
 
         Problem problem = problemService.getProblem(request.problemId());
 
-        SingleTestCaseResult singleTestCaseResult = compilerService.runScriptForOneTestCaseVersionOne(request, problem);
+        SingleTestCaseResult singleTestCaseResult = compilerService.runScriptForOneTestCase(request, problem);
 
         return ResponseEntity.ok().body(singleTestCaseResult);
     }

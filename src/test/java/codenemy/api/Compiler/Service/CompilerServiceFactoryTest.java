@@ -1,6 +1,7 @@
 package codenemy.api.Compiler.Service;
 
 import codenemy.api.Compiler.Service.LanguageCompilerService.JavaCompilerService;
+import codenemy.api.Compiler.Service.LanguageCompilerService.JavaScriptCompilerService;
 import codenemy.api.Compiler.Service.LanguageCompilerService.LanguageCompilerServiceIF;
 import codenemy.api.Compiler.Service.LanguageCompilerService.PythonCompilerService;
 import org.hibernate.cfg.NotYetImplementedException;
@@ -50,6 +51,18 @@ public class CompilerServiceFactoryTest {
         assertThat(resultTwo, instanceOf(PythonCompilerService.class));
         assertThat(resultThree, instanceOf(PythonCompilerService.class));
         assertThat(resultFour, instanceOf(PythonCompilerService.class));
+    }
+
+    @Test
+    void loadJavaScriptCompilerService(){
+
+        LanguageCompilerServiceIF result = sut.getSpecificLanguageCompilerService("javascript");
+        LanguageCompilerServiceIF resultTwo = sut.getSpecificLanguageCompilerService("js");
+        LanguageCompilerServiceIF resultThree = sut.getSpecificLanguageCompilerService("JavaScript");
+
+        assertThat(result, instanceOf(JavaScriptCompilerService.class));
+        assertThat(resultTwo, instanceOf(JavaScriptCompilerService.class));
+        assertThat(resultThree, instanceOf(JavaScriptCompilerService.class));
     }
 
     @Test
