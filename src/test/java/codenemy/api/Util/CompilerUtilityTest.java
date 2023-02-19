@@ -5,10 +5,12 @@ import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,6 +25,11 @@ public class CompilerUtilityTest {
     @BeforeEach
     void setUp(){
         sut = new CompilerUtility();
+    }
+
+    @AfterEach
+    void tearDown() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
     }
 
     @Test
