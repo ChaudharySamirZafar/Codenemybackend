@@ -47,15 +47,14 @@ public class CompilerUtility {
             return null;
         }
 
-        if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()
-                || pistonResponse.run().signal() != null) {
-            // Get the errors.
-            if (pistonResponse.run().signal().equalsIgnoreCase("SIGKILL")) {
-                testCaseResult.setError(List.of("Your code exceeded the runtime time limit\n"));
-            } else {
+        if (pistonResponse.run().signal() != null && pistonResponse.run().signal().equalsIgnoreCase("SIGKILL")) {
+            testCaseResult.setError(List.of("Your code exceeded the runtime time limit\n"));
+            return testCaseResult;
+        }
+
+        if (!pistonResponse.run().stderr().isEmpty() || !pistonResponse.run().stderr().isBlank()) {
                 List<String> errors = Arrays.asList(pistonResponse.run().stderr().split("\n"));
                 testCaseResult.setError(errors);
-            }
             return testCaseResult;
         }
 
