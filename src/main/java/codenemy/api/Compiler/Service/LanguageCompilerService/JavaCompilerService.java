@@ -23,6 +23,8 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage) {
+        CompilerUtility compilerUtil = new CompilerUtility();
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.java", buildFinalScript(request, problemLanguage.getTestRunOne()), request.language(), JAVA_VERSION);
@@ -36,6 +38,8 @@ public class JavaCompilerService implements LanguageCompilerServiceIF {
 
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage) {
+        CompilerUtility compilerUtil = new CompilerUtility();
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.java", buildFinalScript(request, problemLanguage.getTestRunAll()), request.language(), JAVA_VERSION);
