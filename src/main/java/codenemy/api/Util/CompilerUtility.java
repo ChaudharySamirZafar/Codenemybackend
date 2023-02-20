@@ -35,7 +35,7 @@ public class CompilerUtility {
     static int MEDIUM_POINT_MULTIPLIER = 20;
     static int HARD_POINT_MULTIPLIER = 30;
 
-    public TestCaseResult getTestCaseResult(String fileName, String fileContent, String programmingLang, String version) {
+    public synchronized TestCaseResult getTestCaseResult(String fileName, String fileContent, String programmingLang, String version) {
         TestCaseResult testCaseResult = new TestCaseResult(0, null);
 
         List<PistonFile> fileArrayList = List.of(new PistonFile(fileName, fileContent));
