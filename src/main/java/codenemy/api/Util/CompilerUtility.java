@@ -48,7 +48,8 @@ public class CompilerUtility {
             pistonResponse = makeRequest(pistonRequest).get();
         }
         catch (Exception e){
-            log.info("Exception in async method.");
+            log.info("################ - Exception in async method. - #################");
+            return null;
         }
 
         if (pistonResponse == null) {
@@ -87,52 +88,60 @@ public class CompilerUtility {
 
     @Async
     public CompletableFuture<PistonResponse> makeRequest(PistonRequest requestData) {
-        String url = "https://emkc.org/api/v2/piston/execute";
+        return CompletableFuture.supplyAsync(() -> {
+            String url = "https://emkc.org/api/v2/piston/execute";
 
-        URL obj = null;
-        HttpURLConnection con = null;
+            URL obj = null;
+            HttpURLConnection con = null;
 
-        try {
-            obj = new URL(url);
-            con = (HttpURLConnection) obj.openConnection();
+            try {
+                obj = new URL(url);
+                con = (HttpURLConnection) obj.openConnection();
 
-            // Set the request method and headers
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
+                // Set the request method and headers
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
 
-            ObjectMapper objectMapper = new ObjectMapper();
+                ObjectMapper objectMapper = new ObjectMapper();
 
-            // Set the request body
-            String requestBody = objectMapper.writeValueAsString(requestData);
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(requestBody);
-            wr.flush();
-            wr.close();
+                // Set the request body
+                String requestBody = objectMapper.writeValueAsString(requestData);
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(requestBody);
+                wr.flush();
+                wr.close();
 
-            // Get the response
-            int responseCode = con.getResponseCode();
+                // Add throttling
+                Thread.sleep(3000); // wait for 3 seconds before sending the request
 
-            // Check if the response is okay
-            if (responseCode == HttpStatus.OK.value()) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                // Get the response
+                int responseCode = con.getResponseCode();
+
+                // Check if the response is okay
+                if (responseCode == HttpStatus.OK.value()) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String inputLine;
+                    StringBuilder response = new StringBuilder();
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+
+                    in.close();
+
+                    // Deserialize the response
+                    return objectMapper.readValue(response.toString(), PistonResponse.class);
+                } else {
+                    throw new RuntimeException("Request failed with error code: " + responseCode);
                 }
-
-                in.close();
-
-                // Deserialize the response
-                return CompletableFuture.completedFuture(objectMapper.readValue(response.toString(), PistonResponse.class));
+            } catch (Exception exception) {
+                throw new RuntimeException("Failed to execute request", exception);
+            } finally {
+                if (con != null) {
+                    con.disconnect();
+                }
             }
-        }
-        catch (Exception exception) {
-            log.info(exception.getMessage());
-        }
-
-        return CompletableFuture.completedFuture(null);
+        });
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
