@@ -16,8 +16,6 @@ public class JavaScriptCompilerService implements LanguageCompilerServiceIF {
 
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage) {
-        CompilerUtility compilerUtil = new CompilerUtility();
-
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.js", request.script() + "\n" + problemLanguage.getTestRunOne(), request.language(), JAVASCRIPT_VERSION);
@@ -31,8 +29,6 @@ public class JavaScriptCompilerService implements LanguageCompilerServiceIF {
 
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage) {
-        CompilerUtility compilerUtil = new CompilerUtility();
-
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.js", request.script() + "\n" + problemLanguage.getTestRunAll(), request.language(), JAVASCRIPT_VERSION);
