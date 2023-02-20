@@ -11,7 +11,6 @@ import codenemy.api.Problem.model.TestCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,7 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -42,14 +40,7 @@ public class CompilerUtility {
         PistonRequest pistonRequest = new PistonRequest(programmingLang, fileArrayList);
         pistonRequest.setVersion(version);
 
-        PistonResponse pistonResponse = null;
-
-        try {
-            pistonResponse = makeRequest(pistonRequest).get();
-        }
-        catch (Exception e){
-            log.info("Exception in async method.");
-        }
+        PistonResponse pistonResponse = makeRequest(pistonRequest);
 
         if (pistonResponse == null) {
             log.info("The request to piston is breaking.");
@@ -86,8 +77,7 @@ public class CompilerUtility {
         return testCaseResult;
     }
 
-    @Async
-    public CompletableFuture<PistonResponse> makeRequest(PistonRequest requestData) {
+    public PistonResponse makeRequest(PistonRequest requestData) {
         String url = "https://emkc.org/api/v2/piston/execute";
 
         URL obj = null;
@@ -102,6 +92,9 @@ public class CompilerUtility {
             con.setRequestProperty("Content-Type", "application/json");
 
             ObjectMapper objectMapper = new ObjectMapper();
+
+            // Add throttling
+            Thread.sleep(3000); // wait for 1 second before sending the request
 
             // Set the request body
             String requestBody = objectMapper.writeValueAsString(requestData);
@@ -126,14 +119,14 @@ public class CompilerUtility {
                 in.close();
 
                 // Deserialize the response
-                return CompletableFuture.completedFuture(objectMapper.readValue(response.toString(), PistonResponse.class));
+                return objectMapper.readValue(response.toString(), PistonResponse.class);
             }
         }
         catch (Exception exception) {
             log.info(exception.getMessage());
         }
 
-        return CompletableFuture.completedFuture(null);
+        return null;
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
