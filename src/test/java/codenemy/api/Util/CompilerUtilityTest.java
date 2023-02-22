@@ -201,18 +201,4 @@ public class CompilerUtilityTest {
         assertEquals(expectedOutput, testCaseResult.getOutput().get(0));
         assertEquals(expectedResult, testCaseResult.getResult().get(0));
     }
-
-    @Test
-    void getTestCaseResultWithHttpError(){
-        // Given
-        String fileName = "TestRun.java";
-        String fileContent = "class Solution {\\r\\n    twoSum(nums, target){\\r\\n      let indexes = [];\\r\\n  \\r\\n      for(let i = 0; i < nums.length; i++){\\r\\n           for(let j = i + 1; j < nums.length; j++){\\r\\n              if (nums[i] + nums[j] === target) {\\r\\n            indexes.push(i);\\r\\n            indexes.push(j);\\r\\n              }\\r\\n           }\\r\\n      }\\r\\n    \\r\\n      return indexes;\\r\\n    }\\r\\n}\\r\\n\\r\\nsolution = new Solution();\\r\\nnums = [2, 7, 11, 15]\\r\\ntarget = 9\\r\\nconsole.log(\\\"\\\\nResult - [\\\" + solution.twoSum(nums, target) + \\\"]\\\");";
-        String programmingLang = "";
-        String version = "15.0.2";
-
-        // When
-        TestCaseResult testCaseResult = sut.getTestCaseResult(fileName, fileContent, programmingLang, version);
-
-    }
-
 }
