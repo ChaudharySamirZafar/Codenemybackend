@@ -8,15 +8,12 @@ import codenemy.api.Compiler.Model.SingleTestCaseResult;
 import codenemy.api.Compiler.Model.TestCaseResult;
 import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.TestCase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,55 +75,26 @@ public class CompilerUtility {
     }
 
     public PistonResponse makeRequest(PistonRequest requestData) {
-        String url = "https://emkc.org/api/v2/piston/execute";
+        WebClient client = WebClient.create("https://emkc.org/api/v2/piston");
 
-        URL obj = null;
-        HttpURLConnection con = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        // Create an instance of the Jackson ObjectMapper to convert the request data to JSON.
 
+        String requestBody;
         try {
-            obj = new URL(url);
-            con = (HttpURLConnection) obj.openConnection();
-
-            // Set the request method and headers
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // Add throttling
-            Thread.sleep(3000); // wait for 1 second before sending the request
-
-            // Set the request body
-            String requestBody = objectMapper.writeValueAsString(requestData);
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(requestBody);
-            wr.flush();
-            wr.close();
-
-            // Get the response
-            int responseCode = con.getResponseCode();
-
-            // Check if the response is okay
-            if (responseCode == HttpStatus.OK.value()) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-
-                in.close();
-
-                // Deserialize the response
-                return objectMapper.readValue(response.toString(), PistonResponse.class);
-            }
-        }
-        catch (Exception exception) {
-            log.info(exception.getMessage());
+            requestBody = objectMapper.writeValueAsString(requestData);
+        } catch (JsonProcessingException e) {
+            // Handle any errors that occur while converting the request data to JSON.
+            throw new RuntimeException("Error converting request data to JSON", e);
         }
 
-        return null;
+        return client
+                .post()
+                .uri("/execute/")
+                .body(BodyInserters.fromValue(requestBody))
+                .retrieve()
+                .bodyToMono(PistonResponse.class)
+                .block(Duration.ofSeconds(10));
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
