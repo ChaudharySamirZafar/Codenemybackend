@@ -11,8 +11,13 @@ import codenemy.api.Problem.model.TestCase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,23 +83,41 @@ public class CompilerUtility {
         WebClient client = WebClient.create("https://emkc.org/api/v2/piston");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        // Create an instance of the Jackson ObjectMapper to convert the request data to JSON.
 
         String requestBody;
         try {
             requestBody = objectMapper.writeValueAsString(requestData);
         } catch (JsonProcessingException e) {
-            // Handle any errors that occur while converting the request data to JSON.
             throw new RuntimeException("Error converting request data to JSON", e);
         }
 
-        return client
-                .post()
-                .uri("/execute/")
-                .body(BodyInserters.fromValue(requestBody))
-                .retrieve()
-                .bodyToMono(PistonResponse.class)
-                .block(Duration.ofSeconds(10));
+        int maxRetries = 3;
+        int retryCount = 0;
+        long retryDelayMs = 1000;
+
+        while (true) {
+            try {
+                return client
+                        .post()
+                        .uri("/execute/")
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .body(BodyInserters.fromValue(requestBody))
+                        .retrieve()
+                        .bodyToMono(PistonResponse.class)
+                        .block(Duration.ofSeconds(10));
+            } catch (WebClientResponseException e) {
+                if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS && retryCount < maxRetries) {
+                    // If we receive a 429 error and haven't exceeded the max retries, wait and retry the request.
+                    retryCount++;
+                    try {
+                        Thread.sleep(retryDelayMs);
+                    } catch (InterruptedException ignored) {}
+                } else {
+                    // If the error is not a 429 error, or if we've exceeded the max retries, re-throw the exception.
+                    throw e;
+                }
+            }
+        }
     }
 
     public SingleTestCaseResult calculateSingleTestResultWithResponse(Problem problem, TestCaseResult result) {
