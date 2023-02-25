@@ -17,9 +17,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class ProblemServiceTest {
@@ -29,16 +29,16 @@ public class ProblemServiceTest {
     @Mock
     SubmissionRepository submissionRepository;
 
-
     @BeforeEach
     void setUp(){
+
         sut = new ProblemService(problemRepository, submissionRepository);
     }
 
     @Test
     void getAllProblems(){
+
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
             problemArrayList
@@ -66,8 +66,8 @@ public class ProblemServiceTest {
 
     @Test
     void getAllProblemsLoggedIn(){
+
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
             problemArrayList
@@ -120,6 +120,7 @@ public class ProblemServiceTest {
 
     @Test
     void getAllProblemsLoggedInEmptyProblemList(){
+
         // Given
         when(problemRepository.findAll()).thenReturn(new ArrayList<Problem>());
         when(submissionRepository.findSubmissionByUser(0)).thenReturn(null);
@@ -134,6 +135,7 @@ public class ProblemServiceTest {
 
     @Test
     void getProblem(){
+
         // Given
         Problem problem = new Problem(
                 1,

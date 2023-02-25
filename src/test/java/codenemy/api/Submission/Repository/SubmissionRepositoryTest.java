@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @DataJpaTest
 public class SubmissionRepositoryTest {
@@ -34,6 +34,7 @@ public class SubmissionRepositoryTest {
 
     @AfterEach
     void tearDown(){
+
         sut.deleteAll();
         userRepo.deleteAll();
         problemRepository.deleteAll();
@@ -42,7 +43,8 @@ public class SubmissionRepositoryTest {
 
     @Test
     void findSubmissionByUser(){
-        // Create some mock objects and add them.
+
+        // Given
         User user = new User();
         user.setId(0);
         userRepo.save(user);
@@ -55,6 +57,7 @@ public class SubmissionRepositoryTest {
                 new Submission(0, user, problem, LocalDateTime.now(), "", 100,0 );
         sut.save(mockSubmission);
 
+        // When
         Set<Integer> result = sut.findSubmissionByUser(user.getId());
 
         assertEquals(1, result.size());
@@ -63,7 +66,8 @@ public class SubmissionRepositoryTest {
 
     @Test
     void findSubmissionByUserAndProblem(){
-        // Create some mock objects and add them.
+
+        // Given
         User user = new User();
         user.setId(0);
         userRepo.save(user);
@@ -76,8 +80,10 @@ public class SubmissionRepositoryTest {
                 new Submission(0, user, problem, LocalDateTime.now(), "", 0,0 );
         sut.save(mockSubmission);
 
+        // When
         List<Submission> result = sut.findSubmissionByUserAndProblem(user.getId(), problem.getId());
 
+        // Then
         assertEquals(1, result.size());
         assertTrue(result.contains(mockSubmission));
     }

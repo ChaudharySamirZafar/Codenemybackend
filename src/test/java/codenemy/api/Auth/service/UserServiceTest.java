@@ -54,10 +54,12 @@ class UserServiceTest {
     @Test
     void loadUserByUsername() {
 
+        // When
         assertThatThrownBy(() -> sut.loadUserByUsername("samir"))
                 .hasMessage("User not found in the database")
                 .isInstanceOf(UsernameNotFoundException.class);
 
+        // Then
         verify(mockUserRepo).findByUsername("samir");
     }
 
@@ -86,16 +88,16 @@ class UserServiceTest {
     @Test
     void saveUser() {
 
-        // given
+        // Given
         User testUser = new User(1, "samirzafar", "samir786", 0, 0, null, null);
 
-        // when
+        // When
         when(mockUserRepo.findByUsername(testUser.getUsername())).thenReturn(testUser);
         when(mockRoleRepo.findByName("ROLE_USER")).thenReturn(new Role(1, "ROLE_USER"));
 
         sut.saveUser(testUser);
 
-        // then
+        // Then
         ArgumentCaptor<User> coderArgumentCaptor =
                 ArgumentCaptor.forClass(User.class);
 
@@ -109,13 +111,13 @@ class UserServiceTest {
     @Test
     void saveRole() {
 
-        // given
+        // Given
         Role testRole = new Role(1, "TEST_ROLE");
 
-        // when
+        // When
         sut.saveRole(testRole);
 
-        // then
+        // Then
         ArgumentCaptor<Role> roleArgumentCaptor =
                 ArgumentCaptor.forClass(Role.class);
 
@@ -136,10 +138,10 @@ class UserServiceTest {
         when(mockUserRepo.findByUsername(testUser.getUsername())).thenReturn(testUser);
         when(mockRoleRepo.findByName(testRole.getName())).thenReturn(testRole);
 
-        // when
+        // When
         sut.addRoleToUser("samirzafar", "ROLE_USER");
 
-        // then
+        // Then
         verify(mockUserRepo).findByUsername(testUser.getUsername());
         verify(mockRoleRepo).findByName(testRole.getName());
     }
@@ -154,10 +156,10 @@ class UserServiceTest {
         Role testRole = new Role(1, "TEST_ROLE");
         when(mockRoleRepo.findByName("TEST_ROLE")).thenReturn(testRole);
 
-        // when
+        // When
         sut.addRoleToUser("samir", "TEST_ROLE");
 
-        // then
+        // Then
         verify(mockUserRepo).findByUsername("samir");
         verify(mockRoleRepo).findByName("TEST_ROLE");
         assertThat(testUser.getRoles().size()).isEqualTo(1);
@@ -178,10 +180,10 @@ class UserServiceTest {
         Role testRole = new Role(1, "TEST_ROLE_V2");
         when(mockRoleRepo.findByName("TEST_ROLE_V2")).thenReturn(testRole);
 
-        // when
+        // When
         sut.addRoleToUser("samirzafar", "TEST_ROLE_V2");
 
-        // then
+        // Then
         verify(mockUserRepo).findByUsername("samirzafar");
         verify(mockRoleRepo).findByName("TEST_ROLE_V2");
         assertThat(testUser.getRoles().size()).isEqualTo(3);
@@ -202,10 +204,10 @@ class UserServiceTest {
         Role testRole = new Role(1, "TEST_ROLE");
         when(mockRoleRepo.findByName("TEST_ROLE")).thenReturn(testRole);
 
-        // when
+        // When
         sut.addRoleToUser("samirzafar", "TEST_ROLE");
 
-        // then
+        // Then
         verify(mockUserRepo).findByUsername("samirzafar");
         verify(mockRoleRepo).findByName("TEST_ROLE");
         assertThat(testUser.getRoles().size()).isEqualTo(listOfRoles.size());

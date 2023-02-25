@@ -15,25 +15,22 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 public class CompilerUtilityTest {
     CompilerUtility sut;
 
     @BeforeEach
     void setUp(){
-        sut = new CompilerUtility();
-    }
 
-    @AfterEach
-    void tearDown() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(5);
+        sut = new CompilerUtility();
     }
 
     @Test
     void calculateSingleTestResultPass(){
+
         // Given
         TestCaseResult testCaseResult = new TestCaseResult(0, new ArrayList<String>());
         testCaseResult.getResult().add("[0,1]");
@@ -54,6 +51,7 @@ public class CompilerUtilityTest {
 
     @Test
     void calculateSingleTestResultFail(){
+
         // Given
         TestCaseResult testCaseResult = new TestCaseResult(0, new ArrayList<String>());
         testCaseResult.getResult().add("[0,4]");
@@ -73,6 +71,7 @@ public class CompilerUtilityTest {
 
     @Test
     void calculateAllTestResultPass(){
+
         // Given
         TestCaseResult testCaseResult = new TestCaseResult(0, new ArrayList<String>());
         testCaseResult.getResult().add("[0,1]");
@@ -105,6 +104,7 @@ public class CompilerUtilityTest {
 
     @Test
     void calculateAllTestResultMediumPass(){
+
         // Given
         TestCaseResult testCaseResult = new TestCaseResult(0, new ArrayList<String>());
         testCaseResult.getResult().add("[0,1]");
@@ -137,6 +137,7 @@ public class CompilerUtilityTest {
 
     @Test
     void calculateAllTestResultHardPass(){
+
         // Given
         TestCaseResult testCaseResult = new TestCaseResult(0, new ArrayList<String>());
         testCaseResult.getResult().add("[0,1]");
@@ -169,6 +170,7 @@ public class CompilerUtilityTest {
 
     @Test
     void getTestCaseResultWithError(){
+
         // Given
         String fileName = "TestRun.py";
         String fileContent = "class Solution {\\r\\n    twoSum(nums, target){\\r\\n      let indexes = [];\\r\\n  \\r\\n      for(let i = 0; i < nums.length; i++){\\r\\n           for(let j = i + 1; j < nums.length; j++){\\r\\n              if (nums[i] + nums[j] === target) {\\r\\n            indexes.push(i);\\r\\n            indexes.push(j);\\r\\n              }\\r\\n           }\\r\\n      }\\r\\n    \\r\\n      return indexes;\\r\\n    }\\r\\n}\\r\\n\\r\\nsolution = new Solution();\\r\\nnums = [2, 7, 11, 15]\\r\\ntarget = 9\\r\\nconsole.log(\\\"\\\\nResult - [\\\" + solution.twoSum(nums, target) + \\\"]\\\");";
@@ -184,6 +186,7 @@ public class CompilerUtilityTest {
 
     @Test
     void getTestCaseResult(){
+
         // Given
         String expectedOutput = "Sum of x+y = 35\n";
         String expectedResult = "35";

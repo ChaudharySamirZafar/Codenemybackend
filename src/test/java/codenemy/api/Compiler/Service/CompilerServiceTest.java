@@ -29,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ComponentScan("codenemy.api.Problem.repository")
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +51,7 @@ public class CompilerServiceTest {
 
     @BeforeEach
     void setUp(){
+
         sut = new CompilerService(mockCompilerServiceFactory, mockSubmissionService, objectMapper);
 
         ArrayList<Tag> tags = new ArrayList<>();
@@ -104,8 +105,6 @@ public class CompilerServiceTest {
                         "}"));
 
         mockProblem = new Problem(1, "Two Sum", "Description", tags, testCases, problemLanguages, "Easy", false);
-
-        User mockUser = new User(1, "samirzafar", "password", 0, 0, null, null);
     }
 
     @Test
@@ -188,7 +187,7 @@ public class CompilerServiceTest {
         when(mockCompilerServiceFactory.getSpecificLanguageCompilerService("java")).thenReturn(mockJavaCompilerService);
         when(mockJavaCompilerService.executeAllTestCases(request, mockProblem, mockProblem.getProblemLanguages().get(0))).thenReturn(multipleTestCaseResults);
 
-
+        // Then
         assertThatThrownBy(() ->  sut.runScriptForAllTestCases(request, mockProblem))
                 .isInstanceOf(RuntimeException.class);
     }

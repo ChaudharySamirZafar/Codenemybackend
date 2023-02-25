@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class SubmissionServiceTest {
@@ -40,6 +40,7 @@ public class SubmissionServiceTest {
 
     @Test
     void addSubmission(){
+
         // Given
         User user =
                 new User(1, "samirzafar", "password", 0, 0, null, null);
@@ -63,6 +64,7 @@ public class SubmissionServiceTest {
 
     @Test
     void addSubmissionWIthSecondSubmissionWithHigherPoints(){
+
         // Given
         User user =
                 new User(1, "samirzafar", "password", 400, 0, null, null);
@@ -92,6 +94,7 @@ public class SubmissionServiceTest {
 
     @Test
     void addSubmissionWIthSecondSubmissionWithLowerPoints(){
+
         // Given
         User user =
                 new User(1, "samirzafar", "password", 600, 0, null, null);

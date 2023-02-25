@@ -21,9 +21,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class UtilityTest {
@@ -32,12 +32,14 @@ public class UtilityTest {
 
     @BeforeEach
     void setUp() {
+
         mockResponse = new MockHttpServletResponse();
         mockRequest = new MockHttpServletRequest();
     }
 
     @Test
-    void decodeJwtWithNoErrors() throws IOException {
+    void decodeJwtWithNoErrors() {
+
         // Given
         String subject = "samir";
         String issuer = "/mockUrl";
@@ -64,7 +66,8 @@ public class UtilityTest {
 
     // Test comment
     @Test
-    void decodeJwtWithErrors() throws IOException {
+    void decodeJwtWithErrors() {
+
         // Given
         mockRequest.addHeader(AUTHORIZATION, "Bearer testing");;
 
@@ -78,6 +81,7 @@ public class UtilityTest {
 
     @Test
     void writeTokenValues() throws UnsupportedEncodingException, JSONException {
+
         // Given
         String mockAccessToken = "mockAccessToken";
         String mockRefreshToken = "mockRefreshToken";
@@ -93,7 +97,8 @@ public class UtilityTest {
     }
 
     @Test
-    void writeTokenValuesWithError() throws UnsupportedEncodingException, JSONException {
+    void writeTokenValuesWithError() {
+
         // Given
         String mockAccessToken = "mockAccessToken";
         String mockRefreshToken = "mockRefreshToken";

@@ -15,9 +15,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class CompilerServiceFactoryTest {
@@ -26,15 +26,18 @@ public class CompilerServiceFactoryTest {
 
     @BeforeEach
     void setUp(){
+
         sut = new CompilerServiceFactory();
     }
 
     @Test
     void loadJavaCompilerService(){
 
+        // When
         LanguageCompilerServiceIF result = sut.getSpecificLanguageCompilerService("Java");
         LanguageCompilerServiceIF resultTwo = sut.getSpecificLanguageCompilerService("java");
 
+        // Then
         assertThat(result, instanceOf(JavaCompilerService.class));
         assertThat(resultTwo, instanceOf(JavaCompilerService.class));
     }
@@ -42,11 +45,13 @@ public class CompilerServiceFactoryTest {
     @Test
     void loadPythonCompilerService(){
 
+        // When
         LanguageCompilerServiceIF result = sut.getSpecificLanguageCompilerService("python");
         LanguageCompilerServiceIF resultTwo = sut.getSpecificLanguageCompilerService("Python");
         LanguageCompilerServiceIF resultThree = sut.getSpecificLanguageCompilerService("Python3");
         LanguageCompilerServiceIF resultFour = sut.getSpecificLanguageCompilerService("python3");
 
+        // Then
         assertThat(result, instanceOf(PythonCompilerService.class));
         assertThat(resultTwo, instanceOf(PythonCompilerService.class));
         assertThat(resultThree, instanceOf(PythonCompilerService.class));
@@ -56,10 +61,12 @@ public class CompilerServiceFactoryTest {
     @Test
     void loadJavaScriptCompilerService(){
 
+        // When
         LanguageCompilerServiceIF result = sut.getSpecificLanguageCompilerService("javascript");
         LanguageCompilerServiceIF resultTwo = sut.getSpecificLanguageCompilerService("js");
         LanguageCompilerServiceIF resultThree = sut.getSpecificLanguageCompilerService("JavaScript");
 
+        // Then
         assertThat(result, instanceOf(JavaScriptCompilerService.class));
         assertThat(resultTwo, instanceOf(JavaScriptCompilerService.class));
         assertThat(resultThree, instanceOf(JavaScriptCompilerService.class));
@@ -67,6 +74,7 @@ public class CompilerServiceFactoryTest {
 
     @Test
     void loadCompilerServiceThatDoesntExist(){
+
         assertThatThrownBy(() -> sut.getSpecificLanguageCompilerService("C#"))
                 .hasMessage("C# does not have a compiler service yet.")
                 .isInstanceOf(NotYetImplementedException.class);

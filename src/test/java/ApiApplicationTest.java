@@ -2,9 +2,9 @@ import codenemy.api.ApiApplication;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 public class ApiApplicationTest {
 

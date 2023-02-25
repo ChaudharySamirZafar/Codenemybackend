@@ -17,12 +17,13 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class CompilerControllerTest {
@@ -31,18 +32,22 @@ public class CompilerControllerTest {
     ProblemService problemService;
     @Mock
     CompilerService compilerService;
+    Request request;
+    Problem problem;
 
     @BeforeEach
     void setUp(){
+
+        request = new Request("java", "helloWorld", 2, "samirzafar", 1);
+        problem = new Problem();
         sut = new CompilerController(problemService, compilerService);
     }
 
     @Test
     void runScriptForOneTestCase(){
+
         // Given
         Problem problem = new Problem();
-        Request request =
-                new Request("java", "helloWorld", 2, "samirzafar", 1);
         SingleTestCaseResult singleTestCaseResult =
                 new SingleTestCaseResult("input", "o", "uo", List.of("oops"), false, null);
         when(problemService.getProblem(2)).thenReturn(problem);
@@ -54,14 +59,15 @@ public class CompilerControllerTest {
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(singleTestCaseResult, result.getBody());
+        verify(problemService).getProblem(2);
+        verify(compilerService).runScriptForOneTestCase(request, problem);
     }
 
     @Test
     void runScriptForAllTestCases(){
+
         // Given
         Problem problem = new Problem();
-        Request request =
-                new Request("java", "helloWorld", 2, "samirzafar", 1);
         MultipleTestCaseResults multipleTestCaseResults =
                 new MultipleTestCaseResults();
         multipleTestCaseResults.setPoints(100);
@@ -77,14 +83,15 @@ public class CompilerControllerTest {
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(multipleTestCaseResults, result.getBody());
+        verify(problemService).getProblem(2);
+        verify(compilerService).runScriptForAllTestCases(request, problem);
     }
 
     @Test
     void runScriptForAllTestCasesWithChallenge(){
+
         // Given
         Problem problem = new Problem();
-        Request request =
-                new Request("java", "helloWorld", 2, "samirzafar", 1);
         MultipleTestCaseResults multipleTestCaseResults =
                 new MultipleTestCaseResults();
         multipleTestCaseResults.setPoints(100);
@@ -100,5 +107,7 @@ public class CompilerControllerTest {
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(multipleTestCaseResults, result.getBody());
+        verify(problemService).getProblem(2);
+        verify(compilerService).runScriptForAllTestCasesWithChallenge(request, problem);
     }
 }

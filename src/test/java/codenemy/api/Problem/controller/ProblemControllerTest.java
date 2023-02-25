@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class ProblemControllerTest {
@@ -31,6 +31,7 @@ public class ProblemControllerTest {
 
     @BeforeEach
     void setUp(){
+
         sut = new ProblemController(problemService);
     }
 
@@ -38,7 +39,6 @@ public class ProblemControllerTest {
     void getAllProblems(){
 
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
                 problemArrayList
@@ -129,7 +129,6 @@ public class ProblemControllerTest {
     void getAllProblemsThatUserHasSolved(){
 
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 1; i <= 5; i++) {
             Problem problem =
@@ -157,7 +156,6 @@ public class ProblemControllerTest {
     void getSpecificProblem(){
 
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 0; i < 2; i++) {
             problemArrayList
@@ -182,7 +180,6 @@ public class ProblemControllerTest {
     void getCount(){
 
         // Given
-        // Create an arraylist
         ArrayList<Problem> problemArrayList = new ArrayList<>();
         for(int i = 0; i < 2; i++) {
             problemArrayList

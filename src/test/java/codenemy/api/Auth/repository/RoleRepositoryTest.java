@@ -28,28 +28,28 @@ class RoleRepositoryTest {
     @Test
     void itShouldReturnTheRoleIfTheRoleExists() {
 
-        // given
+        // Given
         String roleName = "ROLE_ADMIN";
         Role expectedRole = new Role(1, roleName);
         sut.save(expectedRole);
 
-        // when
+        // When
         Role roleFound = sut.findByName(roleName);
 
-        // then
+        // Then
         assertThat(roleFound).isEqualTo(expectedRole);
     }
 
     @Test
     void itShouldReturnNullIfRoleDoesNotExist() {
 
-        // given
+        // Given
         String roleName = "ROLE_ADMIN";
 
-        // when
+        // When
         Role roleFound = sut.findByName(roleName);
 
-        // then
+        // Then
         assertThat(roleFound).isNull();
     }
 }

@@ -28,30 +28,30 @@ class UserRepositoryTest {
     @Test
     void itShouldReturnTheUserIfTheUserExists() {
 
-        // given
+        // Given
         String username = "samirzafar";
 
         User expectedUser =
                 new User(0, "samirzafar", "samir786",0,0,null, null);
         sut.save(expectedUser);
 
-        // when
+        // When
         User userFound = sut.findByUsername(username);
 
-        // then
+        // Then
         Assertions.assertEquals(expectedUser, userFound);
     }
 
     @Test
     void itShouldReturnNullIfUserDoesNotExist() {
 
-        // given
+        // Given
         String username = "samirzafar";
 
-        // when
+        // When
         User userFound = sut.findByUsername(username);
 
-        // then
+        // Then
         assertThat(userFound).isNull();
     }
 }
