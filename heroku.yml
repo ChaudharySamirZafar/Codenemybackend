@@ -4,4 +4,4 @@ build:
 run:
   java:
     jdk: adopt@1.18
-    memory: 256M
+    memory: 512M
