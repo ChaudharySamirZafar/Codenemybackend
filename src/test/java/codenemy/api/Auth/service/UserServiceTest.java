@@ -2,6 +2,8 @@ package codenemy.api.Auth.service;
 
 import codenemy.api.Auth.model.Role;
 import codenemy.api.Auth.model.User;
+import codenemy.api.Auth.model.UserDTO;
+import codenemy.api.Auth.model.UserDTOMapper;
 import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +28,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -41,9 +43,12 @@ class UserServiceTest {
     @Mock
     private BCryptPasswordEncoder mockBCryptPasswordEncoder;
 
+    private final UserDTOMapper userDTOMapper = new UserDTOMapper();
+
     @BeforeEach
     void setUp() {
-        sut = new UserService(mockUserRepo, mockRoleRepo, mockBCryptPasswordEncoder);
+
+        sut = new UserService(mockUserRepo, mockRoleRepo, mockBCryptPasswordEncoder, userDTOMapper);
     }
 
     @Test
@@ -58,19 +63,24 @@ class UserServiceTest {
 
     @Test
     void loadUserByUsernameUserExists() {
+
+        // Given
         List<Role> listOfRoles = new ArrayList<Role>();
         listOfRoles.add(new Role(1, "TEST_ROLE"));
         listOfRoles.add(new Role(2, "TEST"));
 
-        User testUser = new User(1, "samirzafar", "samir786", 0, 0, null, listOfRoles);
+        User testUser =
+                new User(1, "samirzafar", "samir786", 0, 0, null, listOfRoles);
         when(mockUserRepo.findByUsername("samir")).thenReturn(testUser);
 
+        // When
         UserDetails result = sut.loadUserByUsername("samir");
 
+        // Then
         verify(mockUserRepo).findByUsername("samir");
-        assertThat(result.getUsername()).isEqualTo(testUser.getUsername());
-        assertThat(result.getPassword()).isEqualTo(testUser.getPassword());
-        assertThat(result.getAuthorities().size()).isEqualTo(listOfRoles.size());
+        assertEquals(testUser.getUsername(), result.getUsername());
+        assertEquals(testUser.getPassword(), testUser.getPassword());
+        assertEquals(result.getAuthorities().size(), listOfRoles.size());
     }
 
     @Test
@@ -101,8 +111,10 @@ class UserServiceTest {
 
         // given
         Role testRole = new Role(1, "TEST_ROLE");
+
         // when
         sut.saveRole(testRole);
+
         // then
         ArgumentCaptor<Role> roleArgumentCaptor =
                 ArgumentCaptor.forClass(Role.class);
@@ -116,6 +128,8 @@ class UserServiceTest {
 
     @Test
     void addRoleToUser() {
+
+        // Given
         User testUser = new User(1, "samirzafar", "samir786", 0, 0, null, null);
         Role testRole = new Role(1, "ROLE_USER");
 
@@ -142,6 +156,7 @@ class UserServiceTest {
 
         // when
         sut.addRoleToUser("samir", "TEST_ROLE");
+
         // then
         verify(mockUserRepo).findByUsername("samir");
         verify(mockRoleRepo).findByName("TEST_ROLE");
@@ -151,11 +166,11 @@ class UserServiceTest {
     @Test
     void addRoleToUserWhenUserExistsWithRoles() {
 
+        // Given
         List<Role> listOfRoles = new ArrayList<Role>();
         listOfRoles.add(new Role(1, "TEST_ROLE"));
         listOfRoles.add(new Role(2, "TEST"));
 
-        // Given
         User testUser =
                 new User(1, "samirzafar", "samir786", 0, 0, null, listOfRoles);
         when(mockUserRepo.findByUsername("samirzafar")).thenReturn(testUser);
@@ -175,11 +190,11 @@ class UserServiceTest {
     @Test
     void addRoleToUserWhenTheyAlreadyHaveThatRole() {
 
+        // Given
         List<Role> listOfRoles = new ArrayList<Role>();
         listOfRoles.add(new Role(1, "TEST_ROLE"));
         listOfRoles.add(new Role(2, "TEST"));
 
-        // Given
         User testUser =
                 new User(1, "samirzafar", "samir786", 0, 0, null, listOfRoles);
         when(mockUserRepo.findByUsername("samirzafar")).thenReturn(testUser);
@@ -209,11 +224,11 @@ class UserServiceTest {
     @Test
     void addRoleThatDoesntExistToUser(){
 
+        // Given
         List<Role> listOfRoles = new ArrayList<Role>();
         listOfRoles.add(new Role(1, "TEST_ROLE"));
         listOfRoles.add(new Role(2, "TEST"));
 
-        // Given
         User testUser =
                 new User(1, "samirzafar", "samir786", 0, 0, null, listOfRoles);
         when(mockUserRepo.findByUsername("samirzafar")).thenReturn(testUser);
@@ -230,23 +245,31 @@ class UserServiceTest {
     @Test
     void getUser() {
 
-        // when
+        // Given
+        User testUser =
+                new User(1, "samir", "samir786", 0, 0, null, null);
+        when(mockUserRepo.findByUsername("samir")).thenReturn(testUser);
+
+        // When
         sut.getUser("samir");
-        // then
+
+        // Then
         verify(mockUserRepo).findByUsername("samir");
     }
 
     @Test
     void getUsers() {
 
-        // when
+        // When
         sut.getUsers();
-        // then
+
+        // Then
         verify(mockUserRepo).findAll();
     }
 
     @Test
     void updateUser() {
+
         // Given
         int userId = 5;
         String newUserName = "updatedUserName";
@@ -256,11 +279,10 @@ class UserServiceTest {
         when(mockBCryptPasswordEncoder.encode(newPassword)).thenReturn(newPassword);
 
         // When
-        User result = sut.updateUser(userId, newUserName, newPassword);
+        UserDTO result = sut.updateUser(userId, newUserName, newPassword);
 
         // Then
-        assertEquals(newUserName, result.getUsername());
-        assertEquals(newPassword, result.getPassword());
+        assertEquals(newUserName, result.username());
 
         verify(mockUserRepo).findById(userId);
         verify(mockUserRepo).save(user);
@@ -268,6 +290,7 @@ class UserServiceTest {
 
     @Test
     void updateUserThatDoesNotExist() {
+
         // Given
         int userId = 5;
         String newUserName = "updatedUserName";

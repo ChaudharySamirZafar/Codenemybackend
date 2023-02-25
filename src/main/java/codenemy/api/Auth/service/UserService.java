@@ -2,6 +2,8 @@ package codenemy.api.Auth.service;
 
 import codenemy.api.Auth.model.Role;
 import codenemy.api.Auth.model.User;
+import codenemy.api.Auth.model.UserDTO;
+import codenemy.api.Auth.model.UserDTOMapper;
 import codenemy.api.Auth.repository.RoleRepo;
 import codenemy.api.Auth.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +17,12 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -30,8 +33,11 @@ public class UserService implements IUserService, UserDetailsService {
     private final RoleRepo roleRepo;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    private final UserDTOMapper userDTOMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) {
+
         User user = userRepo.findByUsername(username);
 
         validateUser(user);
@@ -42,16 +48,16 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public User saveUser(User user) {
+    public void saveUser(User user) {
+
         log.info("Saving user : {} to the database", user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepo.save(user);
         addRoleToUser(user.getUsername(), "ROLE_USER");
-        return user;
     }
 
-    public User updateUser(int userId, String newUserName, String newPassword) {
-        // First find the user.
+    public UserDTO updateUser(int userId, String newUserName, String newPassword) {
+
         Optional<User> user = userRepo.findById(userId);
 
         if (user.isEmpty()) return null;
@@ -65,17 +71,18 @@ public class UserService implements IUserService, UserDetailsService {
 
         userRepo.save(user.get());
 
-        return user.get();
+        return userDTOMapper.apply(user.get());
     }
 
     @Override
-    public Role saveRole(Role role) {
+    public void saveRole(Role role) {
+
         log.info("Saving role : {} to the database", role.getName());
-        return roleRepo.save(role);
+        roleRepo.save(role);
     }
 
     @Override
-    public User addRoleToUser(String username, String roleName) {
+    public UserDTO addRoleToUser(String username, String roleName) {
 
         User user = userRepo.findByUsername(username);
         validateUser(user);
@@ -96,22 +103,33 @@ public class UserService implements IUserService, UserDetailsService {
             if (!roleFound) user.getRoles().add(role);
         }
 
-        return user;
+        return userDTOMapper.apply(user);
     }
 
     @Override
-    public User getUser(String username) {
+    public UserDTO getUser(String username) {
+
         log.info("fetching user : {}", username);
-        return userRepo.findByUsername(username);
+        return userDTOMapper.apply(userRepo.findByUsername(username));
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<UserDTO> getUsers() {
+
         log.info("fetching all users");
-        return userRepo.findAll();
+        return userRepo.findAll()
+                .stream()
+                .map(userDTOMapper)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO transformUserObject(User user) {
+
+        return userDTOMapper.apply(user);
     }
 
     private void validateUser(User user){
+
         if (user == null){
             log.info("User was not found in the database");
             throw new UsernameNotFoundException("User not found in the database");
@@ -123,6 +141,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     private void validateRole(Role role){
+
         if (role == null){
             log.info("Role was not found in the database");
             throw new NoSuchElementException("Role not found in the database");

@@ -9,9 +9,10 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * @author chaudhary samir zafar
+ * This class is mapped to the `Problem` table in the database.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 30/12/2022
+ * @since 1.0
  */
 @Entity
 @Getter

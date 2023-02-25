@@ -28,9 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -46,6 +46,7 @@ public class UserControllerIntegrationTest {
 
     @BeforeEach
     public void setUp() {
+
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
@@ -54,12 +55,14 @@ public class UserControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
+
         userRepo.deleteAll();
         roleRepo.deleteAll();;
     }
 
     @Test
     void getAllUserWithNoPermissions() throws Exception {
+
         this.mvc.perform(
                         get("/api/getAllUsers"))
                 .andExpect(status().isForbidden());
@@ -67,6 +70,7 @@ public class UserControllerIntegrationTest {
 
     @Test
     void logInWithWrongDetails() throws Exception {
+
         this.mvc.perform(
                 get("http://localhost:8085/api/user/login")
                         .param("username","samirzafar")
@@ -77,11 +81,11 @@ public class UserControllerIntegrationTest {
 
     @Test
     void registerAUser() throws Exception {
-        // Create a new role
+
+
         Role role = new Role(0, "ROLE_USER");
         roleRepo.save(role);
 
-        // Register a user before
         User user =
                 new User(0, "samirzafar", "Samir786!", 0, 0, null, List.of(role));
 
@@ -99,11 +103,10 @@ public class UserControllerIntegrationTest {
 
     @Test
     void registerAUserAndLogIn() throws Exception {
-        // Create a new role
+
         Role role = new Role(0, "ROLE_USER");
         roleRepo.save(role);
 
-        // Register a user before
         User user =
                 new User(0, "samirzafar", "Samir786!", 0, 0, null, List.of(role));
 
@@ -128,11 +131,10 @@ public class UserControllerIntegrationTest {
 
     @Test
     void getAllUsersWithIncorrectPermissions() throws Exception {
-        // Create a new role
+
         Role role = new Role(0, "ROLE_USER");
         roleRepo.save(role);
 
-        // Register a user before
         User user =
                 new User(0, "samirzafar", "Samir786!", 0, 0, null, List.of(role));
 
@@ -165,11 +167,11 @@ public class UserControllerIntegrationTest {
 
     @Test
     void getAllUsersWithCorrectPermissions() throws Exception {
-        // Create a new role
+
         Role role = new Role(0, "ROLE_ADMIN");
         roleRepo.saveAll(List.of(new Role(0, "ROLE_USER"), role));
 
-        // Register a user before
+
         User user =
                 new User(0, "samirzafar", "Samir786!", 0, 0, null, List.of(role));
 

@@ -7,12 +7,12 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Entity(name = "_User")
 @Data
@@ -29,5 +29,5 @@ public class User {
     @Type(type="org.hibernate.type.ImageType")
     private byte[] image;
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 }

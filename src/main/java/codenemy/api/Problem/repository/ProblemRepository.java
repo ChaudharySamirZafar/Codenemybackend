@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 30/12/2022
+ * @since 1.0
  */
 @Repository
 public interface ProblemRepository extends JpaRepository<Problem, Integer> {

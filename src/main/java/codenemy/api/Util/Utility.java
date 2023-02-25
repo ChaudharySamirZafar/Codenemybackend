@@ -18,49 +18,65 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Slf4j
 public class Utility {
-
     public final static Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
 
-    public static DecodedJWT decodeJWT(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    /**
+     * Reusable method to decode JSON Web Token
+     */
+    public static DecodedJWT decodeJWT(HttpServletRequest request, HttpServletResponse response) {
+
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         DecodedJWT decodedJWT = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String token = authorizationHeader.substring("Bearer ".length());
+
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 decodedJWT = verifier.verify(token);
-            }
-            catch (JWTVerificationException exception) {
-                log.error("Error logging in {}", exception.getMessage());
+            } catch (JWTVerificationException exception) {
+                log.error("JWTVerificationException Error in decodeJWT - {}", exception.getMessage());
+
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
                 Map<String, String> error = new HashMap<>();
                 error.put("error_message", exception.getMessage());
+
                 response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
+
+                try {
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                } catch (IOException ioException) {
+                    log.error("IOException Error - {}", exception.getMessage());
+                }
             }
         }
 
         return decodedJWT;
     }
 
-    public static void writeTokenValues(String access_token, String refresh_token, HttpServletResponse response){
+    /**
+     * Reusable method to write access & refresh tokens to a response.
+     */
+    public static void writeTokenValues(String access_token, String refresh_token, HttpServletResponse response) {
+
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);
+
         response.setContentType(APPLICATION_JSON_VALUE);
+
         try {
             new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-        }
-        catch (Exception exception) {
-            log.error("Error logging in {}", exception.getMessage());
+        } catch (Exception exception) {
+            log.error("{} Error in writeTokenValues {}", exception.getClass(), exception.getMessage());
         }
     }
 }

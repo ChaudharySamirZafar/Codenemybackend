@@ -14,9 +14,10 @@ import java.time.LocalDateTime;
 import static javax.persistence.FetchType.LAZY;
 
 /**
- * @author chaudhary samir zafar
+ * The `Submission` class is mapped to the `submission` table in the database.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 @Entity
 @Getter

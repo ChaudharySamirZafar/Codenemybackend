@@ -7,11 +7,20 @@ import codenemy.api.Problem.model.Problem;
 import codenemy.api.Problem.model.ProblemLanguage;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 public interface LanguageCompilerServiceIF {
-    public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage);
-    public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage);
+
+    /**
+     * This method run's when the user attempts to run the code.
+     */
+    SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage);
+
+    /**
+     * This method run's when the user attempts to submit the code
+     * or when the user attempts to submit their code for a problem whilst they are challenging other users
+     */
+    MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage);
 }

@@ -2,6 +2,7 @@ package codenemy.api.Auth.controller;
 
 import codenemy.api.Auth.model.Role;
 import codenemy.api.Auth.model.User;
+import codenemy.api.Auth.model.UserDTO;
 import codenemy.api.Auth.service.UserService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -29,9 +30,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
@@ -42,33 +43,36 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp(){
+
         sut = new UserController(userService);
     }
 
     @Test
     void getAllUsers(){
+
         // Given
-        List<User> userArrayList = new ArrayList<User>();
+        List<UserDTO> userArrayList = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
-            userArrayList.add(new User(0, "username"+i, "password"+i, i, i, null, null));
+            userArrayList.add(new UserDTO(i, "username" + i, 0, 0, null, null));
         }
         when(userService.getUsers()).thenReturn(userArrayList);
 
         // When
-        ResponseEntity<List<User>> result = sut.getAllUsers();
+        ResponseEntity<List<UserDTO>> result = sut.getAllUsers();
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(userArrayList, result.getBody());
+        verify(userService).getUsers();
     }
 
     @Test
     void addRoleToUser(){
+
         // Given
-        User user = new User(0, "testuser", "testpassword", 1000, 1500, null,
-                new ArrayList<>());
+        UserDTO user = new UserDTO(0, "testuser",  1000, 1500, null, new ArrayList<>());
         Role role = new Role(1, "admin");
-        user.getRoles().add(role);
+        user.roles().add(role);
 
         RoleToUserForm roleToUserForm = new RoleToUserForm();
         roleToUserForm.setRoleName("admin");
@@ -77,18 +81,19 @@ public class UserControllerTest {
         when(userService.addRoleToUser(roleToUserForm.getUsername(), roleToUserForm.getRoleName())).thenReturn(user);
 
         // When
-        ResponseEntity<User> result = sut.addRoleToUser(roleToUserForm);
+        ResponseEntity<UserDTO> result = sut.addRoleToUser(roleToUserForm);
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(user, result.getBody());
+        verify(userService).addRoleToUser(roleToUserForm.getUsername(), roleToUserForm.getRoleName());
     }
 
     @Test
     void changeUserDetails(){
+
         // Given
-        User user = new User(0, "testuser", "testpassword", 1000, 1500, null,
-                new ArrayList<>());
+        UserDTO user = new UserDTO(0, "testuser",  1000, 1500, null, new ArrayList<>());
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -101,24 +106,29 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(userService).updateUser(0, "", "");
 
+        // Extract the access token and ensure the subject, issuer and claims are correct
         String access_token = (String) Objects.requireNonNull(result.getBody()).get("access_token");
 
         DecodedJWT decodedJWT;
         JWTVerifier verifier = JWT.require(algorithm).build();
         decodedJWT = verifier.verify(access_token);
 
-        assertEquals(user.getUsername(), decodedJWT.getSubject());
+        assertEquals(user.username(), decodedJWT.getSubject());
         assertNull(decodedJWT.getClaim("roles").asString());
         assertEquals("http://localhost", decodedJWT.getIssuer());
     }
 
     @Test
     void registerUser() throws IOException {
+
         // Given
         User user = new User(0, "testuser", "testpassword", 1000, 1500, new byte[0],
                 new ArrayList<>());
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
+        when(userService.transformUserObject(user)).thenReturn(new UserDTO(user.getId(),
+                user.getUsername(), user.getProblemPoints(), user.getCompetitionPoints(),
+                user.getImage(), user.getRoles()));
 
         // When
         ResponseEntity<HashMap<String, Object>> result = sut.registerUser(user, request, response);
@@ -127,6 +137,7 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(userService).saveUser(user);
 
+        // Extract the access token and ensure the subject, issuer and claims are correct
         String access_token = (String) Objects.requireNonNull(result.getBody()).get("access_token");
 
         DecodedJWT decodedJWT;

@@ -8,9 +8,10 @@ import javax.persistence.Transient;
 import java.util.List;
 
 /**
- * @author chaudhary samir zafar
+ * This class is a DTO, Used to inform the client what percentage they got and how many points.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 @Getter
 @Setter

@@ -19,9 +19,9 @@ import java.util.Collection;
 import static java.util.Arrays.stream;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
@@ -33,6 +33,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         if (request.getServletPath().equals("/api/user/login")) {
             filterChain.doFilter(request, response);
         }
