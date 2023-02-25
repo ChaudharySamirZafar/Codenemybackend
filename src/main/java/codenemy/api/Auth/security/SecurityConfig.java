@@ -23,9 +23,9 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Configuration
 @EnableWebSecurity
@@ -37,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
@@ -45,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         CustomAuthenticationFilter customAuthenticationFilter =
                 new CustomAuthenticationFilter(authenticationManagerBean(), userService);
 
@@ -57,7 +59,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             var cors = new CorsConfiguration();
             cors.setAllowedOrigins(List.of(
                     "http://localhost:3000",
-                    "http://localhost:3002",
                     "https://www.codenemy.com"));
             cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(List.of("*"));
@@ -70,8 +71,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Requests that anyone should be able to make
         http.authorizeRequests().antMatchers("/api/user/**").permitAll();
         http.authorizeRequests().antMatchers("/api/problem/**").permitAll();
-
-        // Requests only people that have logged in should have
         http.authorizeRequests().antMatchers("/api/compiler/runSingleTestCase").permitAll();
         http.authorizeRequests().antMatchers("/api/compiler/runAllTestCases").permitAll();
         http.authorizeRequests().antMatchers("/api/compiler/runAllTestCasesChallenge").permitAll();
@@ -88,6 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
+
       return super.authenticationManagerBean();
     }
 }

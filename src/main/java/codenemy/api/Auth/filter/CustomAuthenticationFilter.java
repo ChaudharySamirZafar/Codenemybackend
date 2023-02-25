@@ -1,5 +1,6 @@
 package codenemy.api.Auth.filter;
 
+import codenemy.api.Auth.model.UserDTO;
 import codenemy.api.Auth.service.UserService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -26,9 +27,9 @@ import java.util.stream.Collectors;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 28/12/2022
+ * @since 1.0
  */
 @Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -46,6 +47,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -59,6 +61,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+
         User user = (User) authentication.getPrincipal();
 
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
@@ -82,8 +85,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("refresh_token", refresh_token);
 
         // Making a request to the user service to retrieve extra details
-        codenemy.api.Auth.model.User userModel = userService.getUser(user.getUsername());
-        tokens.put("userModel", userModel);
+        UserDTO userDTO = userService.getUser(user.getUsername());
+        tokens.put("userModel", userDTO);
 
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);

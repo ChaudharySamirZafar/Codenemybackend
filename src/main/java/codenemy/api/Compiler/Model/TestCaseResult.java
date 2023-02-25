@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author chaudhary samir zafar
+ * This class is used internally. It's primary purpose is to get the code output, result and errors.
+ * After this object is constructed it will be used to make a SingleTestCaseResult or MultipleTestCaseResults object.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 @Getter
 @Setter

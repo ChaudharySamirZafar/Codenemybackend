@@ -14,8 +14,12 @@ public class JavaScriptCompilerService implements LanguageCompilerServiceIF {
     CompilerUtility compilerUtil;
     private static final String JAVASCRIPT_VERSION = "16.3.0";
 
+    /**
+     * This method run's when the user attempts to run the code.
+     */
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage) {
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.js", request.script() + "\n" + problemLanguage.getTestRunOne(), request.language(), JAVASCRIPT_VERSION);
@@ -27,8 +31,13 @@ public class JavaScriptCompilerService implements LanguageCompilerServiceIF {
         return compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
     }
 
+    /**
+     * This method run's when the user attempts to submit the code
+     * or when the user attempts to submit their code for a problem whilst they are challenging other users
+     */
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage) {
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.js", request.script() + "\n" + problemLanguage.getTestRunAll(), request.language(), JAVASCRIPT_VERSION);

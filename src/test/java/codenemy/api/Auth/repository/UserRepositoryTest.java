@@ -2,6 +2,7 @@ package codenemy.api.Auth.repository;
 
 import codenemy.api.Auth.model.User;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -9,9 +10,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 18/01/2023
+ * @since 1.0
  */
 @DataJpaTest
 class UserRepositoryTest {
@@ -30,18 +31,15 @@ class UserRepositoryTest {
         // given
         String username = "samirzafar";
 
-        User expectedUser = new User(0, "samirzafar", "samir786",0,0,null, null);
+        User expectedUser =
+                new User(0, "samirzafar", "samir786",0,0,null, null);
         sut.save(expectedUser);
 
         // when
         User userFound = sut.findByUsername(username);
 
         // then
-        assertThat(userFound.getUsername()).isEqualTo(expectedUser.getUsername());
-        assertThat(userFound.getPassword()).isEqualTo(expectedUser.getPassword());
-        assertThat(userFound.getProblemPoints()).isEqualTo(expectedUser.getProblemPoints());
-        assertThat(userFound.getCompetitionPoints()).isEqualTo(expectedUser.getCompetitionPoints());
-        assertThat(userFound.getImage()).isEqualTo(expectedUser.getImage());
+        Assertions.assertEquals(expectedUser, userFound);
     }
 
     @Test

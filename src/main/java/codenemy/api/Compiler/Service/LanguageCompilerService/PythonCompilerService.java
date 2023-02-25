@@ -10,17 +10,21 @@ import codenemy.api.Util.CompilerUtility;
 import lombok.AllArgsConstructor;
 
 /**
- * @author chaudhary samir zafar
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 @AllArgsConstructor
 public class PythonCompilerService implements LanguageCompilerServiceIF {
     CompilerUtility compilerUtil;
     private static final String PYTHON_VERSION = "3.10.0";
 
+    /**
+     * This method run's when the user attempts to run the code.
+     */
     @Override
     public SingleTestCaseResult executeSingleTestCase(Request request, Problem problem, ProblemLanguage problemLanguage) {
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.py", request.script() + "\n" + problemLanguage.getTestRunOne(), request.language(), PYTHON_VERSION);
@@ -32,8 +36,13 @@ public class PythonCompilerService implements LanguageCompilerServiceIF {
         return compilerUtil.calculateSingleTestResultWithResponse(problem, testCaseResult);
     }
 
+    /**
+     * This method run's when the user attempts to submit the code
+     * or when the user attempts to submit their code for a problem whilst they are challenging other users
+     */
     @Override
     public MultipleTestCaseResults executeAllTestCases(Request request, Problem problem, ProblemLanguage problemLanguage) {
+
         TestCaseResult testCaseResult =
                 compilerUtil.getTestCaseResult
                         ("TestRun.py", request.script() + "\n" + problemLanguage.getTestRunAll(), request.language(), PYTHON_VERSION);

@@ -9,9 +9,10 @@ import lombok.Setter;
 import javax.persistence.*;
 
 /**
- * @author chaudhary samir zafar
+ * This class is mapped to the `ProblemLanguage` table in the database.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 30/12/2022
+ * @since 1.0
  */
 @Entity
 @Getter

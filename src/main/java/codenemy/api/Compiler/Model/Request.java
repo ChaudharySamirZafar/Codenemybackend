@@ -1,9 +1,10 @@
 package codenemy.api.Compiler.Model;
 
 /**
- * @author chaudhary samir zafar
+ * This record is a DTO, used for when users want to compile code.
+ * @author Chaudhary Samir Zafar
  * @version 1.0
- * @since 01/01/2023
+ * @since 1.0
  */
 public record Request(String language, String script, int problemId, String username, int userId) {
 }
