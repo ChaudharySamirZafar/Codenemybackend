@@ -1,7 +1,0 @@
-build:
-  maven:
-    goals: package
-run:
-  java:
-    jdk: adopt@1.18
-    memory: 512M
