@@ -1,11 +1,7 @@
 build:
   maven:
     goals: package
-# This specifies that the app should be deployed using the Heroku Java Buildpack
-# which will detect that this is a Spring app and set it up accordingly.
-# Note that the `Procfile` in the root directory must also specify the command
-# to start the Spring app.
 run:
   java:
-    jdkVersion: 16
-    options: -Xmx512m
+    jdk: adopt@1.18
+    memory: 256M
